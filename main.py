@@ -21,10 +21,10 @@ def main():
 
     num = 10000
     sub_img = img[num:num+500, num:num+500, :3]
-    sub_img_bgr = cv2.cvtColor(sub_img, cv2.COLOR_RGB2BGR)
+    sub_img = cv2.cvtColor(sub_img, cv2.COLOR_RGB2BGR)
 
     # Display the image
-    cv2.imshow("500x500 Portion", sub_img_bgr)
+    cv2.imshow("500x500 Portion", sub_img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
