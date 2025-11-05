@@ -5,5 +5,6 @@
         <ul>
             <li>Simone Franceschini</li>
             <li>Dorian Yeh</li>
+            <li>Justin J.K. Hill</li>
         </ul>
 </div>
