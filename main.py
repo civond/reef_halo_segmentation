@@ -1,37 +1,40 @@
 import torch
-import torchvision
+import torch.optim as optim
+import torch.nn as nn
 from torchvision.models.detection import maskrcnn_resnet50_fpn, MaskRCNN_ResNet50_FPN_Weights
-
-weights = MaskRCNN_ResNet50_FPN_Weights.COCO_V1
-model = maskrcnn_resnet50_fpn(weights=weights)
-model.eval()
-
-
+from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
+from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
 import numpy as np
+import cv2
 import os
 os.environ["QT_QPA_PLATFORM"] = "xcb"
 
-
-import cv2
+# Custom functions
 from utils.load_tif import load_tif
 from utils.tile_img import tile_img
+from utils.create_transforms import create_transforms
+from utils.get_loader import get_loader
+from utils.train_fn import train_fn
 
+
+
+# Main loop
 def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print("Device:", device)
 
-    img_dir = "./data/img/"
-    mask_dir = "./data/mask/"
+    train_dir = "./data/"
 
     # Training values
     learning_rate = 1e-5
-    batch_size = 64
+    batch_size = 32
     num_epochs = 10
     num_workers = 10
     image_height = 400
     image_width = 400
     pin_memory = True
     load_model = False
+    train = True
 
     # Import MaskRCNN
     model = maskrcnn_resnet50_fpn(
@@ -39,9 +42,57 @@ def main():
         min_size=400
         )
     
-    print(model)
+    # Replace classification head
+    in_features = model.roi_heads.box_predictor.cls_score.in_features
+    model.roi_heads.box_predictor = FastRCNNPredictor(
+        in_features,
+        num_classes=2  # Halo + background
+    )
 
+    # Replace mask head
+    in_features_mask = model.roi_heads.mask_predictor.conv5_mask.in_channels
+    hidden_layer = 256
+    model.roi_heads.mask_predictor = MaskRCNNPredictor(
+        in_features_mask,
+        hidden_layer,
+        num_classes=2  # Halo + background
+    )
 
+    model.to(device)
+
+    # Create transforms object
+    transforms = create_transforms(
+        image_height, 
+        image_width,
+        train
+        )
+    
+    # Create train and validation loaders  
+    train_loader = get_loader(train_dir, 
+                            batch_size, 
+                            transforms, 
+                            num_workers, 
+                            train, 
+                            pin_memory
+                            )
+
+    # Train loop
+    for epoch in range(num_epochs):
+        print(f"\nEpoch: {epoch}")
+
+        # Train
+        optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+        scaler = torch.amp.GradScaler(device="cuda")
+        
+        train_loss = train_fn(
+            device, 
+            train_loader, 
+            model, 
+            optimizer, 
+            scaler
+            )
+        #training_loss.append(train_loss)
+        #training_dice.append(train_dice)
 
 
 

@@ -1,6 +1,7 @@
 *.pth
 *.tif
 *.png
+*.txt
 
 
 # Byte-compiled / optimized / DLL files
