@@ -1,9 +1,6 @@
 import torch
 import torch.optim as optim
 import torch.nn as nn
-from torchvision.models.detection import maskrcnn_resnet50_fpn, MaskRCNN_ResNet50_FPN_Weights
-from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
-from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
 import numpy as np
 import cv2
 import os
@@ -49,13 +46,14 @@ def main():
     )
     
     # Create train and validation loaders  
-    train_loader = get_loader(train_dir, 
-                            batch_size, 
-                            transforms, 
-                            num_workers, 
-                            train, 
-                            pin_memory
-                            )
+    train_loader = get_loader(
+        train_dir, 
+        batch_size, 
+        transforms, 
+        num_workers, 
+        train, 
+        pin_memory
+    )
 
     # Train loop
     for epoch in range(num_epochs):
@@ -71,7 +69,11 @@ def main():
             model, 
             optimizer, 
             scaler
-            )
+        )
+
+    # Save model
+    torch.save(model.state_dict(), "./model/model.pth")
+
         
         #training_loss.append(train_loss)
         #training_dice.append(train_dice)
