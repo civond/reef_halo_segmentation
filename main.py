@@ -12,6 +12,7 @@ os.environ["QT_QPA_PLATFORM"] = "xcb"
 # Custom functions
 from utils.load_tif import load_tif
 from utils.tile_img import tile_img
+from utils.get_maskrcnn_model import get_maskrcnn_model
 from utils.create_transforms import create_transforms
 from utils.get_loader import get_loader
 from utils.train_fn import train_fn
@@ -37,27 +38,7 @@ def main():
     train = True
 
     # Import MaskRCNN
-    model = maskrcnn_resnet50_fpn(
-        weights=MaskRCNN_ResNet50_FPN_Weights.DEFAULT,
-        min_size=400
-        )
-    
-    # Replace classification head
-    in_features = model.roi_heads.box_predictor.cls_score.in_features
-    model.roi_heads.box_predictor = FastRCNNPredictor(
-        in_features,
-        num_classes=2  # Halo + background
-    )
-
-    # Replace mask head
-    in_features_mask = model.roi_heads.mask_predictor.conv5_mask.in_channels
-    hidden_layer = 256
-    model.roi_heads.mask_predictor = MaskRCNNPredictor(
-        in_features_mask,
-        hidden_layer,
-        num_classes=2  # Halo + background
-    )
-
+    model = get_maskrcnn_model()
     model.to(device)
 
     # Create transforms object
@@ -65,7 +46,7 @@ def main():
         image_height, 
         image_width,
         train
-        )
+    )
     
     # Create train and validation loaders  
     train_loader = get_loader(train_dir, 
@@ -91,6 +72,7 @@ def main():
             optimizer, 
             scaler
             )
+        
         #training_loss.append(train_loss)
         #training_dice.append(train_dice)
 
