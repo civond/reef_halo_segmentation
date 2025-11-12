@@ -10,9 +10,10 @@ os.environ["QT_QPA_PLATFORM"] = "xcb"
 from utils.load_tif import load_tif
 from utils.tile_img import tile_img
 from utils.get_maskrcnn_model import get_maskrcnn_model
-from utils.create_transforms import create_transforms
-from utils.get_loader import get_loader
+from utils.create_transforms import create_train_transforms, create_val_transforms
+from utils.get_loader import get_train_loader, get_val_loader
 from utils.train_fn import train_fn
+from utils.val_fn import val_fn
 
 
 
@@ -21,7 +22,8 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print("Device:", device)
 
-    train_dir = "./data/"
+    train_dir = "./train/"
+    val_dir = "./val/"
 
     # Training values
     learning_rate = 1e-5
@@ -39,20 +41,44 @@ def main():
     model.to(device)
 
     # Create transforms object
-    transforms = create_transforms(
+    train_transforms = create_train_transforms(
+        image_height, 
+        image_width,
+        train
+    )
+
+    val_transforms = create_val_transforms(
         image_height, 
         image_width,
         train
     )
     
     # Create train and validation loaders  
-    train_loader = get_loader(
+    """train_loader = get_train_loader(
         train_dir, 
         batch_size, 
-        transforms, 
+        train_transforms, 
         num_workers, 
         train, 
         pin_memory
+    )"""
+
+    train_loader = get_train_loader(
+        data_dir=train_dir, 
+        batch_size=batch_size, 
+        transform=train_transforms, 
+        num_workers=num_workers, 
+        train=True, 
+        pin_memory=pin_memory
+    )
+
+    val_loader = get_val_loader(
+        data_dir=val_dir, 
+        batch_size=batch_size, 
+        transform=val_transforms, 
+        num_workers=num_workers, 
+        train=False, 
+        pin_memory=pin_memory
     )
 
     # Train loop
@@ -69,6 +95,12 @@ def main():
             model, 
             optimizer, 
             scaler
+        )
+
+        val_loss = val_fn(
+            device=device, 
+            loader=val_loader, 
+            model=model
         )
 
     # Save model

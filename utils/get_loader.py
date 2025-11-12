@@ -3,7 +3,7 @@ from utils.collate_fn import collate_fn
 
 from torch.utils.data import DataLoader
 
-def get_loader(data_dir,
+def get_train_loader(data_dir,
                batch_size,
                transform,
                num_workers=4,
@@ -24,6 +24,29 @@ def get_loader(data_dir,
         pin_memory=pin_memory,
         shuffle=train,
         collate_fn=collate_fn
+    )
+
+    return loader
+
+def get_val_loader(data_dir,
+               batch_size,
+               transform,
+               num_workers=4,
+               train=False,
+               pin_memory=True):
+    
+    dataset = ImageDataset(
+        data_dir, 
+        train=train,
+        transform=transform
+        )
+
+    loader = DataLoader(
+        dataset,
+        batch_size=batch_size,
+        num_workers=num_workers,
+        pin_memory=pin_memory,
+        shuffle=False
     )
 
     return loader
