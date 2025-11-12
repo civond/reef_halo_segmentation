@@ -1,8 +1,6 @@
 import torch
 import torch.optim as optim
-import torch.nn as nn
-import numpy as np
-import cv2
+import pandas as pd
 import os
 os.environ["QT_QPA_PLATFORM"] = "xcb"
 
@@ -54,15 +52,6 @@ def main():
     )
     
     # Create train and validation loaders  
-    """train_loader = get_train_loader(
-        train_dir, 
-        batch_size, 
-        train_transforms, 
-        num_workers, 
-        train, 
-        pin_memory
-    )"""
-
     train_loader = get_train_loader(
         data_dir=train_dir, 
         batch_size=batch_size, 
@@ -81,6 +70,10 @@ def main():
         pin_memory=pin_memory
     )
 
+    # Track loss
+    train_loss_arr = []
+    val_loss_arr = []
+
     # Train loop
     for epoch in range(num_epochs):
         print(f"\nEpoch: {epoch}")
@@ -96,20 +89,26 @@ def main():
             optimizer, 
             scaler
         )
+        print(f"Avg. Train Loss: {train_loss}")
+        train_loss_arr.append(train_loss)
 
         val_loss = val_fn(
             device=device, 
             loader=val_loader, 
             model=model
         )
+        print(f"Avg. Val Loss: {val_loss}")
+        val_loss_arr.append(val_loss)
 
-    # Save model
+    # Save model and loss history
     torch.save(model.state_dict(), "./model/model.pth")
 
-        
-        #training_loss.append(train_loss)
-        #training_dice.append(train_dice)
+    df = pd.DataFrame({
+        "train_loss": train_loss_arr,
+        "val_loss": val_loss_arr
+    })
 
+    df.to_csv("loss_history.csv", index=False)
 
 
 
