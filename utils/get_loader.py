@@ -46,7 +46,8 @@ def get_val_loader(data_dir,
         batch_size=batch_size,
         num_workers=num_workers,
         pin_memory=pin_memory,
-        shuffle=False
+        shuffle=False,
+        collate_fn=collate_fn
     )
 
     return loader
