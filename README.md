@@ -6,10 +6,10 @@
 
 <h3>Usage:</h3>
 <div>
-    Expects folder structure of: 
+    Expects data folder structure of: 
     
     
-    train/
+    data_dir/
     ├── img/
     └── mask/
     
