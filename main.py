@@ -120,9 +120,9 @@ def main():
     val_loss_arr = []
 
     # Early Stopping
-    best_val_loss = float("inf")       
+    best_val_loss = float("inf")
+    best_model_weights = None
     patience_counter = 0
-    checkpoint_path = "best_model.pth"
 
     # Optimizer and scaler
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
@@ -154,7 +154,7 @@ def main():
         if val_loss < (best_val_loss - min_delta):
             best_val_loss = val_loss
             patience_counter = 0
-            
+            best_model_weights = model.state_dict()
             print(f"\tNew best loss")
 
         else:
@@ -168,7 +168,7 @@ def main():
     # Save model and loss history
     print(f"Saving model at: {save_model_pth}")
     torch.save(
-        model.state_dict(), 
+        best_model_weights, 
         save_model_pth
         )
 
