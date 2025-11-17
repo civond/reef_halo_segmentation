@@ -32,7 +32,7 @@
                 <a href="https://www.sciencedirect.com/science/article/pii/S0034425723001359">Original author</a>
             </li>
             <li>
-                Dorian Yeh - Neural network implementation
+                Dorian Yeh - Model workflow implementation
             </li>
             <li>
                 Justin J.K. Hill
