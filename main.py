@@ -1,6 +1,8 @@
 import torch
 import torch.optim as optim
+import argparse
 import pandas as pd
+import toml
 import os
 os.environ["QT_QPA_PLATFORM"] = "xcb"
 
@@ -14,13 +16,32 @@ from utils.train_fn import train_fn
 from utils.val_fn import val_fn
 
 
+# Arg Parser
+def parse_args():
+    parser = argparse.ArgumentParser(description="Train segmentation model")
+    # First positional argument: mode
+    parser.add_argument(
+        "mode",
+        type=str,
+        choices=["train", "inference"],
+        help="Operation mode: 'train' or 'inference'"
+    )
+    
+    # Second positional argument: config
+    parser.add_argument(
+        "config_file", 
+        type=str,
+        help="Path to TOML configuration file"
+    )
+    return parser.parse_args()
+
 
 # Main loop
 def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print("Device:", device)
 
-    train_dir = "./train/"
+    """train_dir = "./train/"
     val_dir = "./val/"
 
     # Training values
@@ -31,8 +52,28 @@ def main():
     image_height = 400
     image_width = 400
     pin_memory = True
-    load_model = False
-    train = True
+    train = True"""
+
+    args = parse_args()
+    mode = args.mode
+    config_path = args.config_file
+    config = toml.load(config_path)
+
+    if mode.lower() == "train":
+        print("Running training loop...")
+
+        # Access TOML values
+        train_dir = config["Paths"]["train_data_dir"]
+        val_dir = config["Paths"]["val_data_dir"]
+
+        learning_rate = config["Hyperparameters"]["learning_rate"]
+        batch_size = config["Hyperparameters"]["batch_size"]
+        num_epochs = config["Hyperparameters"]["num_epochs"]
+        num_workers = config["Hyperparameters"]["num_workers"]
+        image_height = config["Hyperparameters"]["image_height"]
+        image_width = config["Hyperparameters"]["image_width"]
+        pin_memory = config["Hyperparameters"]["pin_memory"]
+        train = config["Hyperparameters"]["train"]
 
     # Import MaskRCNN
     model = get_maskrcnn_model()
@@ -48,7 +89,6 @@ def main():
     val_transforms = create_val_transforms(
         image_height, 
         image_width,
-        train
     )
     
     # Create train and validation loaders  
