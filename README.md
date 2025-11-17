@@ -1,7 +1,8 @@
 <h1>Coral Reef Halo Segmentation</h1>
 
-<img src="./figures/img.png" width=300px>
-<img src="./figures/mask.png" width=300px>
+<div align="center">
+    <img src="./figures/img.png" width=300px> <img src="./figures/mask.png" width=300px>
+</div>
 
 <h3>Usage:</h3>
 <div>
