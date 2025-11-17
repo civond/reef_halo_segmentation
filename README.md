@@ -18,7 +18,7 @@
 <div>
     Run in terminal:
 
-    python -m main.py train train_settings.toml
+    python main.py train train_settings.toml
 
 </div>
 
