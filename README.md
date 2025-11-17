@@ -27,8 +27,15 @@
 <div>
     <h3>Collaborators:</h3>
         <ul>
-            <li>Simone Franceschini</li>
-            <li>Dorian Yeh</li>
-            <li>Justin J.K. Hill</li>
+            <li>
+                <b>Simone Franceschini -</b> 
+                <a href="https://www.sciencedirect.com/science/article/pii/S0034425723001359">Original author</a>
+            </li>
+            <li>
+                <b>Dorian Yeh</b> - Neural network implementation
+            </li>
+            <li>
+                <b>Justin J.K. Hill</b>
+            </li>
         </ul>
 </div>
