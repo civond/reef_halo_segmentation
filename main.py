@@ -65,6 +65,8 @@ def main():
         # Access TOML values
         train_dir = config["Paths"]["train_data_dir"]
         val_dir = config["Paths"]["val_data_dir"]
+        save_model_pth = config["Paths"]["save_model_pth"]
+        save_csv_pth = config["Paths"]["save_csv_pth"]
 
         learning_rate = config["Hyperparameters"]["learning_rate"]
         batch_size = config["Hyperparameters"]["batch_size"]
@@ -74,6 +76,9 @@ def main():
         image_width = config["Hyperparameters"]["image_width"]
         pin_memory = config["Hyperparameters"]["pin_memory"]
         train = config["Hyperparameters"]["train"]
+        patience = config["Hyperparameters"]["patience"]
+        min_delta = config["Hyperparameters"]["min_delta"]
+
 
     # Import MaskRCNN
     model = get_maskrcnn_model()
@@ -114,14 +119,20 @@ def main():
     train_loss_arr = []
     val_loss_arr = []
 
+    # Early Stopping
+    best_val_loss = float("inf")       
+    patience_counter = 0
+    checkpoint_path = "best_model.pth"
+
+    # Optimizer and scaler
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    scaler = torch.amp.GradScaler(device="cuda")
+    
     # Train loop
     for epoch in range(num_epochs):
         print(f"\nEpoch: {epoch}")
 
         # Train
-        optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-        scaler = torch.amp.GradScaler(device="cuda")
-        
         train_loss = train_fn(
             device, 
             train_loader, 
@@ -140,15 +151,37 @@ def main():
         print(f"Avg. Val Loss: {val_loss}")
         val_loss_arr.append(val_loss)
 
-    # Save model and loss history
-    torch.save(model.state_dict(), "./model/model.pth")
+        if val_loss < (best_val_loss - min_delta):
+            best_val_loss = val_loss
+            patience_counter = 0
+            
+            print(f"\tNew best loss")
 
+        else:
+            patience_counter += 1
+            if patience_counter >= patience:
+                print("Early stopping triggered. Exit train loop")
+                break
+
+
+
+    # Save model and loss history
+    print(f"Saving model at: {save_model_pth}")
+    torch.save(
+        model.state_dict(), 
+        save_model_pth
+        )
+
+    print(f"Saving csv at: {save_csv_pth}")
     df = pd.DataFrame({
         "train_loss": train_loss_arr,
         "val_loss": val_loss_arr
     })
 
-    df.to_csv("loss_history.csv", index=False)
+    df.to_csv(
+        save_csv_pth, 
+        index=False
+        )
 
 
 
