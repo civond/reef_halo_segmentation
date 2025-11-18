@@ -4,6 +4,11 @@
     <img src="./figures/img.png" width=300px> <img src="./figures/mask.png" width=300px>
 </div>
 
+<div>
+    (description here)
+    <img src="./figures/loss_fig.png" width=400px>
+</div>
+
 <h3>Usage:</h3>
 <div>
     Expects data folder structure of: 
