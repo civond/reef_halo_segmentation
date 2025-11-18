@@ -6,8 +6,12 @@
 
 <div>
     (description here)
+</div>
+
+<div align="center">
     <img src="./figures/loss_fig.png" width=400px>
 </div>
+
 
 <h3>Usage:</h3>
 <div>
