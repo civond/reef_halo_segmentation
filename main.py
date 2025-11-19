@@ -41,19 +41,6 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print("Device:", device)
 
-    """train_dir = "./train/"
-    val_dir = "./val/"
-
-    # Training values
-    learning_rate = 1e-5
-    batch_size = 32
-    num_epochs = 10
-    num_workers = 10
-    image_height = 400
-    image_width = 400
-    pin_memory = True
-    train = True"""
-
     args = parse_args()
     mode = args.mode
     config_path = args.config_file

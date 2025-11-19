@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
-state_path = "./model/model_new.pth"
+state_path = "./model/model.pth"
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
