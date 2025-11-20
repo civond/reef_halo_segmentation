@@ -21,12 +21,11 @@ from utils.val_fn import val_fn
 # Arg Parser
 def parse_args():
     parser = argparse.ArgumentParser(description="Train segmentation model")
-    # First positional argument: mode
     parser.add_argument(
         "mode",
         type=str,
-        choices=["train", "inference"],
-        help="Operation mode: 'train' or 'inference'"
+        choices=["train", "crossval", "inference"],
+        help="Please choose from: ['train', 'crossval', 'inference']"
     )
     
     # Second positional argument: config
@@ -195,6 +194,6 @@ def main():
         )
     except Exception as e:
         print(f"Error during saving: {e}")
-        
+
 if __name__ == "__main__":
     main()
