@@ -1,6 +1,5 @@
 import torch
 from tqdm import tqdm
-#from utils.dice_score import dice_score
 
 def train_fn(device, loader, model, optimizer):
     model.train()  # make sure model is in training mode

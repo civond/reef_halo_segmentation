@@ -61,9 +61,11 @@ class Trainer:
             weight_decay=1e-4
         )
 
-        # Loss tracking
+        # Metric tracking
         self.train_loss_arr = []
         self.val_loss_arr = []
+        self.train_dice_arr = []
+        self.val_dice_arr = []
         self.best_val_loss = float("inf")
         self.best_model_weights = None
         self.patience_counter = 0
@@ -111,6 +113,7 @@ class Trainer:
 
             print(f"Avg. Train Loss: {train_loss}")
             self.train_loss_arr.append(train_loss)
+
             
 
             # Validation
