@@ -2,7 +2,7 @@ import torch
 from tqdm import tqdm
 #from utils.dice_score import dice_score
 
-def train_fn(device, loader, model, optimizer, scaler):
+def train_fn(device, loader, model, optimizer):
     model.train()  # make sure model is in training mode
     loop = tqdm(loader)
     
@@ -17,6 +17,7 @@ def train_fn(device, loader, model, optimizer, scaler):
 
         ### FP16 Mixed Precision
         """# forward pass
+        scaler = torch.amp.GradScaler(device="cuda")
         with torch.amp.autocast('cuda'):
             loss_dict = model(images, targets)
             loss = sum(loss for loss in loss_dict.values())
