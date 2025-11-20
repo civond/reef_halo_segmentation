@@ -26,9 +26,16 @@
 </div>
 
 <div>
-    Run in terminal:
+    Run train loop:
 
-    python main.py train train_settings.toml
+    python main.py train <train_config.toml>
+
+</div>
+
+<div>
+    Run inference on tif:
+
+    python main.py inference <inference_config.toml>
 
 </div>
 
