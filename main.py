@@ -180,17 +180,23 @@ class Inference:
         paths = self.config["Paths"]
         self.model_pth = paths["model_pth"]
         self.tif_pth = paths["tif_pth"]
-        self.output_pth = paths["output_pth"]
+        self.mask_output_pth = paths["mask_output_pth"]
+        self.blended_output_pth = paths["blended_output_pth"]
         os.makedirs("./output/", exist_ok=True)
         
         # Parameters
         params = self.config["Parameters"]
         self.tile_size = params["tile_size"]
+        self.score_threshold = params["score_threshold"]
 
         # Model
         self.model = get_maskrcnn_model().to(self.device)
         self.model.load_state_dict(torch.load(self.model_pth, map_location=self.device))
         self.model.eval()
+
+        # Images
+        self.raster = None
+        self.raster_mask = None
     
     def process_tif(self):
         [img, profile] = load_tif(tif_pth=self.tif_pth)
@@ -200,6 +206,9 @@ class Inference:
             img = img.astype('uint8')
         img = img[:,:,:3]
         img = img[..., ::-1]
+
+        # Save img in self.raster
+        self.raster = img
 
         [tiles, coords, dims] = tile_img(
             img,
@@ -232,8 +241,7 @@ class Inference:
 
 
                 # Filter predictions by score threshold
-                threshold = 0.001
-                keep = scores > threshold
+                keep = scores > self.score_threshold
 
                 boxes = boxes[keep]
                 labels = labels[keep]
@@ -265,14 +273,42 @@ class Inference:
 
         # Normalize and write to png
         max_label = classification_raster.max()
-        vis_raster = (classification_raster / max_label * 255).astype(np.uint8)
-        
-        print(f"\tWriting mask output to: {self.output_pth}")
-        cv2.imwrite(self.output_pth, vis_raster)
+        mask = (classification_raster / max_label * 255).astype(np.uint8)
+        self.raster_mask = mask
+
+        print(f"\tWriting mask output to: {self.mask_output_pth}")
+        cv2.imwrite(self.mask_output_pth, mask)
 
 
-    def overlay_mask(self):
-        print("Overlaying mask")
+    def overlay_mask(self, alpha=0.3, thickness=-1):
+
+        # Check raster and mask
+        if self.raster is None or self.raster_mask is None:
+            raise ValueError("Run process_tif() before calling overlay_mask().")
+
+        print("Overlaying mask...")
+        binary_mask = (self.raster_mask > 0).astype(np.uint8) * 255
+        contours, hierarchy = cv2.findContours(
+            binary_mask,
+            cv2.RETR_EXTERNAL,    # only outer contours
+            cv2.CHAIN_APPROX_SIMPLE
+        )
+
+        overlay = self.raster.copy()
+
+        # Draw contours in color (blue or something noticeable)
+        cv2.drawContours(
+            overlay,
+            contours,
+            -1,                  # draw all contours
+            (0, 0, 255),         # red contour (BGR)
+            thickness
+        )
+
+        # Fuse with original using alpha blend
+        blended = cv2.addWeighted(self.raster, 1 - alpha, overlay, alpha, 0)
+        print(f"\tWriting overlayed image to {self.blended_output_pth}")
+        cv2.imwrite(self.blended_output_pth, blended)
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Train segmentation model")
@@ -309,6 +345,7 @@ def main():
     if mode.lower() == "inference":
         inf = Inference(config_path)
         inf.process_tif()
+        inf.overlay_mask()
 
 
 if __name__ == "__main__":

@@ -4,11 +4,12 @@
 [Paths]
 model_pth = "./model/model_good.pth"
 tif_pth = "./data_test/belieze.tif"
-output_pth = "./output/output_mask.png"
-
+mask_output_pth = "./output/output_mask.png"
+blended_output_pth = "./output/output_blended.png"
 
 # ============================
 # Parameters
 # ============================
 [Parameters]
 tile_size=400
+score_threshold=0.1

@@ -16,7 +16,7 @@
 
 <h3>Usage:</h3>
 <div>
-    Expects data folder structure of: 
+    During training, this data folder structure is expected: 
     
     
     data_dir/
