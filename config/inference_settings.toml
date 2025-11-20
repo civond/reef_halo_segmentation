@@ -1,0 +1,14 @@
+# ============================
+# Paths
+# ============================
+[Paths]
+model_pth = "./model/model_good.pth"
+tif_pth = "./data_test/belieze.tif"
+output_pth = "./output/output_mask.png"
+
+
+# ============================
+# Parameters
+# ============================
+[Parameters]
+tile_size=400

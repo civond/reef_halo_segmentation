@@ -34,8 +34,8 @@ def tile_img(img, tile_size=512):
             coords.append((row_idx, col_idx))
 
     
-    print(f"\tNum. tiles: {len(tiles)}")
+    """print(f"\tNum. tiles: {len(tiles)}")
     print(f"\tTile shape:{tiles[150][0].shape}")
-    print(f"\tTile coords:{tiles[150][1]}")
+    print(f"\tTile coords:{tiles[150][1]}")"""
 
     return tiles, coords, dims
