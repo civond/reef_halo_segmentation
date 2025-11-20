@@ -28,14 +28,14 @@
 <div>
     Run train loop:
 
-    python main.py train <train_config.toml>
+    python main.py train ./config/train_settings.toml
 
 </div>
 
 <div>
     Run inference on tif:
 
-    python main.py inference <inference_config.toml>
+    python main.py inference ./config/inference_settings.toml
 
 </div>
 

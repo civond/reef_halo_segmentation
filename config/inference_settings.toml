@@ -4,8 +4,7 @@
 [Paths]
 model_pth = "./model/model_good.pth"
 tif_pth = "./data_test/belieze.tif"
-mask_output_pth = "./output/output_mask.png"
-blended_output_pth = "./output/output_blended.png"
+output_dir = "./output/"
 
 # ============================
 # Parameters

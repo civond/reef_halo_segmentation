@@ -180,9 +180,12 @@ class Inference:
         paths = self.config["Paths"]
         self.model_pth = paths["model_pth"]
         self.tif_pth = paths["tif_pth"]
-        self.mask_output_pth = paths["mask_output_pth"]
-        self.blended_output_pth = paths["blended_output_pth"]
-        os.makedirs("./output/", exist_ok=True)
+        #self.mask_output_pth = paths["mask_output_pth"]
+        #self.blended_output_pth = paths["blended_output_pth"]
+
+        # Ensure output dir is created
+        self.output_dir = paths["output_dir"]
+        os.makedirs(self.output_dir, exist_ok=True)
         
         # Parameters
         params = self.config["Parameters"]
@@ -276,8 +279,9 @@ class Inference:
         mask = (classification_raster / max_label * 255).astype(np.uint8)
         self.raster_mask = mask
 
-        print(f"\tWriting mask output to: {self.mask_output_pth}")
-        cv2.imwrite(self.mask_output_pth, mask)
+        mask_output_pth = os.path.join(self.output_dir,'output_mask.png')
+        print(f"\tWriting mask output to: {mask_output_pth}")
+        cv2.imwrite(mask_output_pth, mask)
 
 
     def overlay_mask(self, alpha=0.3, thickness=-1):
@@ -307,8 +311,10 @@ class Inference:
 
         # Fuse with original using alpha blend
         blended = cv2.addWeighted(self.raster, 1 - alpha, overlay, alpha, 0)
-        print(f"\tWriting overlayed image to {self.blended_output_pth}")
-        cv2.imwrite(self.blended_output_pth, blended)
+
+        blended_output_pth = os.path.join(self.output_dir,'output_blended.png')
+        print(f"\tWriting overlayed image to {blended_output_pth}")
+        cv2.imwrite(blended_output_pth, blended)
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Train segmentation model")
