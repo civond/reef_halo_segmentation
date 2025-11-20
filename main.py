@@ -10,6 +10,7 @@ os.environ["QT_QPA_PLATFORM"] = "xcb"
 # Custom functions
 from utils.load_tif import load_tif
 from utils.tile_img import tile_img
+from utils.create_fig import create_fig
 from utils.get_maskrcnn_model import get_maskrcnn_model
 from utils.create_transforms import create_train_transforms, create_val_transforms
 from utils.get_loader import get_train_loader, get_val_loader
@@ -155,19 +156,20 @@ def main():
                 break
     
 
-    # Save model and loss history
+    # Save model, history, figure
     now = datetime.now()
     timestamp = now.strftime("%Y_%m_%d_%H%M")
     save_model_pth = os.path.join(save_model_dir, f"{timestamp}.pth")
     save_csv_pth = os.path.join(save_csv_dir, f"{timestamp}.csv")
+    save_fig_pth = os.path.join("./figures/", f"{timestamp}.png")
 
-    print(f"Saving model at: {save_model_pth}")
+    print(f"\tSaving model at: {save_model_pth}")
     torch.save(
         best_model_weights, 
         save_model_pth
         )
 
-    print(f"Saving csv at: {save_csv_pth}")
+    print(f"\tSaving csv at: {save_csv_pth}")
     df = pd.DataFrame({
         "train_loss": train_loss_arr,
         "val_loss": val_loss_arr
@@ -176,8 +178,13 @@ def main():
     df.to_csv(
         save_csv_pth, 
         index=False
-        )
-
+    )
+    
+    print(f"\tSaving figure at: {save_fig_pth}")
+    create_fig(
+        df, 
+        save_fig_pth
+    )
 
 if __name__ == "__main__":
     main()
