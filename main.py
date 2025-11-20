@@ -1,5 +1,5 @@
 import torch
-import torch.optim as optim
+from torch.optim import AdamW
 import argparse
 import pandas as pd
 import toml
@@ -112,7 +112,14 @@ def main():
     patience_counter = 0
 
     # Optimizer and scaler
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    #optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    optimizer = AdamW(
+        model.parameters(),
+        lr=learning_rate,
+        betas=(0.9, 0.999),
+        weight_decay=1e-4
+        )   
+    
     scaler = torch.amp.GradScaler(device="cuda")
     
     # Train loop

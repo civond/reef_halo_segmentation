@@ -11,7 +11,7 @@ save_csv_pth = "loss_history.csv"
 # Hyperparameters
 # ============================
 [Hyperparameters]
-learning_rate = 1e-5
+learning_rate = 0.0015
 batch_size = 128
 num_epochs = 30
 num_workers = 8

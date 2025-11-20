@@ -14,7 +14,6 @@
     <img src="./figures/loss_fig.png" width=400px>
 </div>
 
-
 <h3>Usage:</h3>
 <div>
     Expects data folder structure of: 
