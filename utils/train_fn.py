@@ -15,8 +15,8 @@ def train_fn(device, loader, model, optimizer, scaler):
         images = list(img.to(device) for img in images)
         targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
 
-
-        # forward pass
+        ### FP16 Mixed Precision
+        """# forward pass
         with torch.amp.autocast('cuda'):
             loss_dict = model(images, targets)
             loss = sum(loss for loss in loss_dict.values())
@@ -33,6 +33,23 @@ def train_fn(device, loader, model, optimizer, scaler):
         scaler.step(optimizer)
         scaler.update()
         
+        total_loss += loss.item()"""
+
+        ## FP32 Full Precision
+        # forward pass
+        loss_dict = model(images, targets)
+        loss = sum(loss for loss in loss_dict.values())
+    
+        # backward pass
+        optimizer.zero_grad()
+        loss.backward()
+
+        # Gradient Clipping
+        max_norm = 1.0 
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm)
+        
+        # Step optimizer
+        optimizer.step()
         total_loss += loss.item()
 
         # update tqdm loop

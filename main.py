@@ -2,6 +2,7 @@ import torch
 from torch.optim import AdamW
 import argparse
 import pandas as pd
+from datetime import datetime
 import toml
 import os
 os.environ["QT_QPA_PLATFORM"] = "xcb"
@@ -52,8 +53,8 @@ def main():
         # Access TOML values
         train_dir = config["Paths"]["train_data_dir"]
         val_dir = config["Paths"]["val_data_dir"]
-        save_model_pth = config["Paths"]["save_model_pth"]
-        save_csv_pth = config["Paths"]["save_csv_pth"]
+        save_model_dir = config["Paths"]["save_model_dir"]
+        save_csv_dir = config["Paths"]["save_csv_dir"]
 
         learning_rate = config["Hyperparameters"]["learning_rate"]
         batch_size = config["Hyperparameters"]["batch_size"]
@@ -156,10 +157,14 @@ def main():
             if patience_counter >= patience:
                 print("Early stopping triggered. Exit train loop")
                 break
-
-
+    
 
     # Save model and loss history
+    now = datetime.now()
+    timestamp = now.strftime("%Y_%m_%d_%H%M")
+    save_model_pth = os.path.join(save_model_dir, f"{timestamp}.pth")
+    save_csv_pth = os.path.join(save_csv_dir, f"{timestamp}.csv")
+
     print(f"Saving model at: {save_model_pth}")
     torch.save(
         best_model_weights, 
@@ -177,24 +182,6 @@ def main():
         index=False
         )
 
-
-
-    """model_path = "./model/Model2.pth"
-    tif_path = "./data/belieze.tif"
-    
-    model = torch.load(model_path, 
-                       map_location=torch.device('cpu')
-                       )
-    #print(model)
-
-    [img, profile] = load_tif(tif_pth=tif_path)
-    img = np.transpose(img, (1, 2, 0))  # transpose from (C, H, W) ---> (H, W, C)
-    print(img.shape)
-
-    img = tile_img(
-        img,
-        tile_size=512
-        )"""
 
 if __name__ == "__main__":
     main()

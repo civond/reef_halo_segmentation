@@ -30,5 +30,5 @@ dependencies:
   - matplotlib  # For visualizing results
 
   # Jupyter (optional, for analysis)
-  - jupyter
-  - ipykernel
+  #- jupyter
+  #- ipykernel
