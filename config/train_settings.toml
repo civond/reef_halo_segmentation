@@ -1,0 +1,24 @@
+# ============================
+# Dataset Directories
+# ============================
+[Paths]
+train_data_dir = "./data_train/"
+val_data_dir =  "./data_val/"
+save_model_dir = "./model/"
+save_csv_dir = "./logs/"
+
+# ============================
+# Hyperparameters
+# ============================
+[Hyperparameters]
+learning_rate = 1e-5
+batch_size = 32
+num_epochs = 50
+num_workers = 8
+image_height = 400
+image_width = 400
+pin_memory = true
+load_model = false
+train = true
+patience = 3
+min_delta = 0.001
