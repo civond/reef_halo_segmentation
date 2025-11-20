@@ -191,6 +191,7 @@ class Inference:
         params = self.config["Parameters"]
         self.tile_size = params["tile_size"]
         self.score_threshold = params["score_threshold"]
+        self.mask_threshold = params["mask_threshold"]
 
         # Model
         self.model = get_maskrcnn_model().to(self.device)
@@ -264,7 +265,7 @@ class Inference:
 
                 for j in range(len(masks)):
                     mask = masks[j, 0].cpu().numpy()  # [H,W]
-                    mask_bin = mask > 0.5             # binary mask
+                    mask_bin = mask > self.mask_threshold            # binary mask
                     class_label = labels[j].item()
                     tile_mask[mask_bin] = class_label  # assign label to masked pixels
 

@@ -12,3 +12,4 @@ output_dir = "./output/"
 [Parameters]
 tile_size=400
 score_threshold=0.1
+mask_threshold = 0.5
