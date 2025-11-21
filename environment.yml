@@ -17,6 +17,7 @@ dependencies:
   - pandas
   - numpy
   - pillow
+  - rasterio
 
   # Image augmentation
   - albumentations
@@ -28,7 +29,3 @@ dependencies:
   # Optional utilities
   - tqdm
   - matplotlib  # For visualizing results
-
-  # Jupyter (optional, for analysis)
-  #- jupyter
-  #- ipykernel
