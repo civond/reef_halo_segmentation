@@ -14,7 +14,7 @@
     <img src="./figures/loss_fig.png" width=400px>
 </div>
 
-<h3>Usage:</h3>
+<h2>Usage:</h2>
 <div>
     During training, this data folder structure is expected: 
     
@@ -23,17 +23,22 @@
     ├── img/
     └── mask/
     
+
+Upon completion, the relevant logs, figures, and model will be outputted in ./logs/ ./figures/ ./model/ respectively. During inference, a raster in the .tif format is required.
 </div>
 
+
+
 <div>
-    Run train loop:
+    <h3>Model Training</h3>
 
     python main.py train ./config/train_settings.toml
 
+
 </div>
 
 <div>
-    Run inference on tif:
+    <h3>Inference</h3>
 
     python main.py inference ./config/inference_settings.toml
 
@@ -42,17 +47,17 @@
 
 
 <div>
-    <h3>Collaborators:</h3>
+    <h2>Collaborators:</h2>
         <ul>
             <li>
-                Simone Franceschini -
+                Simone Franceschini:
                 <a href="https://www.sciencedirect.com/science/article/pii/S0034425723001359">Original author</a>
             </li>
             <li>
-                Dorian Yeh - Model workflow implementation
+                Dorian Yeh: Model workflow implementation
             </li>
             <li>
-                Justin J.K. Hill
+                Justin J.K. Hill: Cross validation
             </li>
         </ul>
 </div>
