@@ -33,6 +33,7 @@ class Trainer:
         self.train_flag = hp["train"]
         self.patience = hp["patience"]
         self.min_delta = hp["min_delta"]
+        self.score_threshold = hp["score_threshold"]
 
         # Paths
         paths = self.config["Paths"]
@@ -102,32 +103,35 @@ class Trainer:
 
             # Train
             train_loss = train_fn(
-                self.device, 
-                self.train_loader, 
-                self.model, 
-                self.optimizer
+                device=self.device, 
+                loader=self.train_loader, 
+                model=self.model, 
+                optimizer=self.optimizer
             )
 
-            print(f"Avg. Train Loss: {train_loss}")
+            print(f"\tAvg. Train Loss: {train_loss}")
             self.train_loss_arr.append(train_loss)
 
 
             # Validation
-            val_loss = val_fn(
-                self.device, 
-                self.val_loader, 
-                self.model
-            
+            val_loss, val_dice = val_fn(
+                device=self.device, 
+                loader=self.val_loader, 
+                model=self.model,
+                score_threshold=self.score_threshold
             )
-            print(f"Avg. Val Loss: {val_loss}")
+
+            print(f"\tAvg. Val Loss: {val_loss}")
+            print(f"\tAvg. Val Dice: {val_dice}")
             self.val_loss_arr.append(val_loss)
+            self.val_dice_arr.append(val_dice)
 
             # Check Patience
             if val_loss < (self.best_val_loss - self.min_delta):
                 self.best_val_loss = val_loss
                 self.patience_counter = 0
                 self.best_model_weights = self.model.state_dict()
-                print("\tNew best loss")
+                print("\t\tNew best loss")
             else:
                 self.patience_counter += 1
                 if self.patience_counter >= self.patience:
@@ -152,7 +156,12 @@ class Trainer:
         # Save CSV
         try:
             print(f"\tSaving csv at: {save_csv_pth}")
-            df = pd.DataFrame({"train_loss": self.train_loss_arr, "val_loss": self.val_loss_arr})
+            df = pd.DataFrame({
+                "train_loss": self.train_loss_arr, 
+                "val_loss": self.val_loss_arr,
+                "val_dice": self.val_dice_arr
+            })
+
             df.to_csv(save_csv_pth, index=False)
         except Exception as e:
             print(f"Error during saving csv: {e}")

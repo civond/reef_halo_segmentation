@@ -24,7 +24,7 @@
     └── mask/
     
 
-Upon completion, the relevant logs, figures, and model will be outputted in ./logs/ ./figures/ ./model/ respectively. During inference, a raster in the .tif format is required.
+Upon exiting the train loop, timestamped logs, figures, and model will be outputted in ./logs/ ./figures/ ./model/ respectively. During inference, a raster in the .tif format is required.
 </div>
 
 

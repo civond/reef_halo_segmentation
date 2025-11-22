@@ -97,18 +97,19 @@ class Inference:
                 """print(f"masks: {masks}")
                 print(f"boxes: {boxes}")
                 print(f"scores: {scores}")"""
-
+                
+                # Skip no detections
                 if len(masks) == 0:
-                    continue  # no detections
+                    continue
 
                 # Combine all masks into a single tile mask
                 tile_mask = np.zeros((self.tile_size, self.tile_size), dtype=np.uint8)
 
                 for j in range(len(masks)):
                     mask = masks[j, 0].cpu().numpy()  # [H,W]
-                    mask_bin = mask > self.mask_threshold            # binary mask
+                    mask_bin = mask > self.mask_threshold
                     class_label = labels[j].item()
-                    tile_mask[mask_bin] = class_label  # assign label to masked pixels
+                    tile_mask[mask_bin] = class_label # assign label to masked pixels
 
                 # Place tile_mask into the correct location in the full raster
                 row_idx, col_idx = coords[i]
@@ -136,18 +137,18 @@ class Inference:
         binary_mask = (self.raster_mask > 0).astype(np.uint8) * 255
         contours, hierarchy = cv2.findContours(
             binary_mask,
-            cv2.RETR_EXTERNAL,    # only outer contours
+            cv2.RETR_EXTERNAL,
             cv2.CHAIN_APPROX_SIMPLE
         )
 
         overlay = self.raster.copy()
 
-        # Draw contours in color (blue or something noticeable)
+        # Draw contours in color
         cv2.drawContours(
             overlay,
             contours,
-            -1,                  # draw all contours
-            (0, 0, 255),         # red contour (BGR)
+            -1,
+            (0, 0, 255),
             thickness
         )
 
