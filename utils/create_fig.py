@@ -1,27 +1,34 @@
 import matplotlib.pyplot as plt
-import pandas as pd
 from matplotlib.ticker import MaxNLocator
+import numpy as np
 
 def create_fig(df, save_fig_path):
     x = range(len(df))
 
     ms = 3
+    train_loss=df['train_loss']
+    val_loss=df['val_loss']
+    val_dice=df['val_dice']
 
     # Plot
-    plt.figure(1, figsize=(5,4))
-
-    #plt.axvline(x=len(x)-4, linestyle="--", color='k', label='Early Stop') 
-    plt.plot(x, df['train_loss'], 'o-', markersize=ms, color='b', label='train loss')
-    plt.plot(x, df['val_loss'], 's-', markersize=ms, color='r', label='val loss')
-    plt.xlabel("Epoch")
+    plt.figure(1, figsize=(5,6))
+    plt.subplot(2,1,1)
+    plt.plot(x, train_loss, 'o-', markersize=ms, color='b', label='train_loss')
+    plt.plot(x, val_loss, 's-', markersize=ms, color='r', label='val_loss')
     plt.ylabel("Loss")
-    plt.title("Mask R-CNN Train / Val Loss")
+    plt.title("Mask R-CNN Train / Val Logs")
     plt.xlim(0,len(x)-1)
     plt.legend()
 
-
     plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 
+
+    plt.subplot(2,1,2)
+    plt.plot(x, val_dice, 's-', markersize=ms, color='r', label='val_dice')
+    plt.xlim(0,len(x)-1)
+    plt.ylim(np.min(val_dice)-.1,1)
+    plt.ylabel("Dice Score")
+    plt.xlabel("Epoch")
+    plt.legend()
     plt.tight_layout()
     plt.savefig(save_fig_path)
-    #plt.show()

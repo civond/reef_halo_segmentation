@@ -135,7 +135,7 @@ class Trainer:
             else:
                 self.patience_counter += 1
                 if self.patience_counter >= self.patience:
-                    print("Early stopping triggered. Exit train loop")
+                    print("\tEarly stopping triggered. Exit train loop")
                     break
 
         self._save_outputs()
