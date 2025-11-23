@@ -16,7 +16,7 @@ This tool extracts reef halo features (ex: clear sand rings surrounding reef pat
 <h2>Training:</h2>
 <p>The training procedure utilized the AdamW optimizer with gradient clipping $(c = 1.0)$, momentum $(\beta_1 = 0.9$ and $\beta_2 = 0.999)$, and weight decay $(\lambda = 1 \times 10^{-4})$. Loss and Dice score trends were computed across training epochs, indicating smooth and stable convergence (figure 1).</p>
     
-<p>An early stopping mechanism $p=3$ based on the validation loss was applied to prevent overfitting with a minimum improvement threshold of $min\_delta= 0.001$.</p>
+<p>An early stopping mechanism $(p=3)$ based on the validation loss was applied to prevent overfitting with a minimum improvement threshold of $min\_delta= 0.001$.</p>
 
 </div>
 
