@@ -1,6 +1,7 @@
 import argparse
 import os
 os.environ["QT_QPA_PLATFORM"] = "xcb"
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 # Custom functions
 from utils.trainer import Trainer

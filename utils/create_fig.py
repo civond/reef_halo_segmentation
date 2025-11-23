@@ -19,7 +19,6 @@ def create_fig(df, save_fig_path, show_plot=False):
     plt.title("Loss")
     plt.xlim(0,len(x)-1)
     plt.legend()
-
     plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 
 
@@ -31,6 +30,7 @@ def create_fig(df, save_fig_path, show_plot=False):
     plt.title("Dice Score")
     plt.xlabel("Epoch")
     plt.legend()
+    plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
     plt.tight_layout()
     plt.savefig(save_fig_path)
 

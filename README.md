@@ -6,12 +6,15 @@
 
 <div>
    <p>This repository contains a fully implemented deep-learning workflow for automated coral reef halo segmentation using high-resolution satellite imagery. The tool is designed to support large-scale ecological monitoring by extracting halo features, clear sand rings around coral patches that are key indicators of reef health, herbivory pressure, and predator–prey dynamics. The workflow is based on a Mask R-CNN model implemented in PyTorch and trained on a curated dataset of manually annotated halos collected from diverse reef environments. The codebase includes all stages of the pipeline, from data preprocessing and augmentation to model training, validation, and inference. Once trained, the model can be used to generate segmentation masks for new satellite scenes, and the provided post-processing functions convert these predictions into clean polygons and GIS-ready outputs.</p>
-<br>
-<p>The figure below shows the training and validation loss curves across epochs. The model converges smoothly, with validation loss closely tracking training loss, indicating stable learning and minimal overfitting.</p>
+</div>
+
+<div>
+    <h2>Training:</h2>
+    <p>The training procedure utilized the AdamW optimizer with gradient clipping, momentum (), and weight decay. Loss and Dice score trends were computed across training epochs, indicating smooth and stable convergence (figure 1). An early stopping mechanism based on the validation loss was applied to prevent overfitting.</p>
 </div>
 
 <div align="center">
-    <img src="./figures/loss_fig.png" width=400px>
+    <img src="./figures/figure.png" width=400px>
 </div>
 
 <h2>Usage:</h2>
@@ -30,7 +33,7 @@ Upon exiting the train loop, timestamped logs, figures, and model will be output
 
 
 <div>
-    <h3>Model Training</h3>
+    <h3>Run Model Training</h3>
 
     python main.py train ./config/train_settings.toml
 
@@ -38,7 +41,7 @@ Upon exiting the train loop, timestamped logs, figures, and model will be output
 </div>
 
 <div>
-    <h3>Inference</h3>
+    <h3>Run Inference</h3>
 
     python main.py inference ./config/inference_settings.toml
 
