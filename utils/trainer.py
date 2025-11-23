@@ -169,6 +169,11 @@ class Trainer:
         # Save figure
         try:
             print(f"\tSaving figure at: {save_fig_pth}")
-            create_fig(df, save_fig_pth)
+            create_fig(
+                df=df, 
+                save_fig_path=save_fig_pth,
+                show_plot=False
+            )
+            
         except Exception as e:
             print(f"Error during saving figure: {e}")

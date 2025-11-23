@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 import numpy as np
 
-def create_fig(df, save_fig_path):
+def create_fig(df, save_fig_path, show_plot=False):
     x = range(len(df))
 
     ms = 3
@@ -11,7 +11,7 @@ def create_fig(df, save_fig_path):
     val_dice=df['val_dice']
 
     # Plot
-    plt.figure(1, figsize=(5,6))
+    plt.figure(1, figsize=(5,7))
     plt.subplot(2,1,1)
     plt.plot(x, train_loss, 'o-', markersize=ms, color='b', label='train_loss')
     plt.plot(x, val_loss, 's-', markersize=ms, color='r', label='val_loss')
@@ -32,3 +32,6 @@ def create_fig(df, save_fig_path):
     plt.legend()
     plt.tight_layout()
     plt.savefig(save_fig_path)
+
+    if show_plot == True:
+        plt.show()
