@@ -5,12 +5,19 @@
 </div>
 
 <div>
-   <p>This repository contains a fully implemented deep-learning workflow for automated coral reef halo segmentation using high-resolution satellite imagery. The tool is designed to support large-scale ecological monitoring by extracting halo features, clear sand rings around coral patches that are key indicators of reef health, herbivory pressure, and predator–prey dynamics. The workflow is based on a Mask R-CNN model implemented in PyTorch and trained on a curated dataset of manually annotated halos collected from diverse reef environments. The codebase includes all stages of the pipeline, from data preprocessing and augmentation to model training, validation, and inference. Once trained, the model can be used to generate segmentation masks for new satellite scenes, and the provided post-processing functions convert these predictions into clean polygons and GIS-ready outputs.</p>
+<p>
+This repository contains a complete deep-learning workflow for automated coral reef halo segmentation using high-resolution satellite imagery.Originally implemented in ArcGIS, the pipeline has been reimplemented here with PyTorch to create an open-source method for large-scale ecological monitoring.
+   
+This tool extracts reef halo features (ex: clear sand rings surrounding reef patches), which are important indicators of reef health, herbivory pressure, and predator–prey dynamics. The workflow is based on a Mask R-CNN model trained on a curated dataset of manually annotated halos collected from diverse reef environments. The codebase includes all stages of the pipeline, from data preprocessing and augmentation to model training, validation, and inference. Once trained, the model can be used to generate segmentation masks for new satellite scenes, and the provided post-processing functions convert these predictions into clean polygons and GIS-ready outputs.
+</p>
 </div>
 
 <div>
-    <h2>Training:</h2>
-    <p>The training procedure utilized the AdamW optimizer with gradient clipping $(c = 1.0)$, momentum $(\beta_1 = 0.9$ and $\beta_2 = 0.999)$, and weight decay $(\lambda = 1 \times 10^{-4})$. Loss and Dice score trends were computed across training epochs, indicating smooth and stable convergence (figure 1). An early stopping mechanism based on the validation loss was applied to prevent overfitting with a minimum improvement threshold of $min\_delta= 0.001$.</p>
+<h2>Training:</h2>
+<p>The training procedure utilized the AdamW optimizer with gradient clipping $(c = 1.0)$, momentum $(\beta_1 = 0.9$ and $\beta_2 = 0.999)$, and weight decay $(\lambda = 1 \times 10^{-4})$. Loss and Dice score trends were computed across training epochs, indicating smooth and stable convergence (figure 1).</p>
+    
+<p>An early stopping mechanism $p=3$ based on the validation loss was applied to prevent overfitting with a minimum improvement threshold of $min\_delta= 0.001$.</p>
+
 </div>
 
 <div align="center">

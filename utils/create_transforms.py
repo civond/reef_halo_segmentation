@@ -4,20 +4,32 @@ from albumentations.pytorch import ToTensorV2
 
 
 # Create transforms object
-def create_train_transforms(IMAGE_HEIGHT, IMAGE_WIDTH, TRAIN=True):
-    if TRAIN == True:
-        transform = A.Compose([
-        A.Resize(IMAGE_HEIGHT, IMAGE_WIDTH),
-        A.HorizontalFlip(p=0.5),
-        A.Rotate(limit=35, p=0.5),
+def create_train_transforms(IMAGE_HEIGHT, IMAGE_WIDTH):
+    
+    transform = A.Compose([
+        A.Resize(
+            IMAGE_HEIGHT, 
+            IMAGE_WIDTH
+        ),
+        A.HorizontalFlip(
+            p=0.5                       # 50% probability
+        ),
+        A.VerticalFlip(
+            p=0.5                       # 50% probability
+        ),
+        A.Rotate(
+            limit=35,                   # +/- 35 degree rotation
+            p=0.5                       # 50% probability
+        ),
+        A.RandomBrightnessContrast(
+            brightness_limit=0.2,       # +/- 20% brightness shift
+            contrast_limit=0.2,         # +/- 20% contrast shift
+            p=0.5                       # 50% probability
+        ),
+
         ToTensorV2()
     ], additional_targets={'mask': 'mask'})
         
-    if TRAIN == False:
-        transform = A.Compose([
-        A.Resize(IMAGE_HEIGHT, IMAGE_WIDTH),
-        ToTensorV2()
-    ], additional_targets={'mask': 'mask'})
         
     return transform
 
