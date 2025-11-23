@@ -16,7 +16,7 @@ def create_fig(df, save_fig_path, show_plot=False):
     plt.plot(x, train_loss, 'o-', markersize=ms, color='b', label='train_loss')
     plt.plot(x, val_loss, 's-', markersize=ms, color='r', label='val_loss')
     plt.ylabel("Avg. Loss")
-    plt.title("Loss Graph")
+    plt.title("Loss")
     plt.xlim(0,len(x)-1)
     plt.legend()
 
