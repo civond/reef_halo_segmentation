@@ -21,12 +21,17 @@ def create_train_transforms(IMAGE_HEIGHT, IMAGE_WIDTH):
             limit=35,                   # +/- 35 degree rotation
             p=0.5                       # 50% probability
         ),
+        A.RGBShift(
+            r_shift_limit=(-10,10),     # Shift red channel up to +/- 10
+            g_shift_limit=(-10,10),     # Shift green channel up to +/- 10
+            b_shift_limit=(-10,10),     # Shift blue channel up to +/- 10
+            p=0.5                       # 50% probability
+        ),
         A.RandomBrightnessContrast(
             brightness_limit=0.2,       # +/- 20% brightness shift
             contrast_limit=0.2,         # +/- 20% contrast shift
             p=0.5                       # 50% probability
         ),
-
         ToTensorV2()
     ], additional_targets={'mask': 'mask'})
         
