@@ -1,9 +1,7 @@
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
-#from utils.get_loader import get_loader
 
-
-# Create transforms object
+# Create transforms object for training
 def create_train_transforms(IMAGE_HEIGHT, IMAGE_WIDTH):
     
     transform = A.Compose([
@@ -38,10 +36,16 @@ def create_train_transforms(IMAGE_HEIGHT, IMAGE_WIDTH):
         
     return transform
 
+
+# Create transform object for validation
 def create_val_transforms(IMAGE_HEIGHT, IMAGE_WIDTH):
+
     transform = A.Compose([
-    A.Resize(IMAGE_HEIGHT, IMAGE_WIDTH),
-    ToTensorV2()
+        A.Resize(
+            IMAGE_HEIGHT, 
+            IMAGE_WIDTH
+        ),
+        ToTensorV2()
     ], additional_targets={'mask': 'mask'})
     
     return transform
