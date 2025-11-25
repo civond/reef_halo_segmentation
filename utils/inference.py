@@ -3,6 +3,7 @@ from torchvision import transforms
 import cv2
 import numpy as np
 import toml
+import sys
 import os
 os.environ["QT_QPA_PLATFORM"] = "xcb"
 
@@ -21,8 +22,11 @@ class Inference:
         paths = self.config["Paths"]
         self.model_pth = paths["model_pth"]
         self.tif_pth = paths["tif_pth"]
-        #self.mask_output_pth = paths["mask_output_pth"]
-        #self.blended_output_pth = paths["blended_output_pth"]
+
+        # Assert path
+        if not self.tif_pth.lower().endswith(".tif"):
+            print(f"Error: Expected .tif file, got: {self.tif_pth}")
+            sys.exit(1)
 
         # Ensure output dir is created
         self.output_dir = paths["output_dir"]
@@ -54,6 +58,7 @@ class Inference:
 
         # Save img in self.raster
         self.raster = img
+        [h_img, w_img] = img.shape[:2]
 
         [tiles, coords, dims] = tile_img(
             img,
@@ -120,6 +125,8 @@ class Inference:
         # Normalize and write to png
         max_label = classification_raster.max()
         mask = (classification_raster / max_label * 255).astype(np.uint8)
+        mask = mask[:h_img, :w_img]
+
         self.raster_mask = mask
 
         mask_output_pth = os.path.join(self.output_dir,'output_mask.png')
@@ -132,7 +139,12 @@ class Inference:
         # Check raster and mask
         if self.raster is None or self.raster_mask is None:
             raise ValueError("Run process_tif() before calling overlay_mask().")
+        
+        assert self.raster.shape[:2] == self.raster_mask.shape[:2], \
+            f"Raster dimensions {self.raster.shape[:2]} and mask dimensions {self.raster_mask.shape[:2]} do not match"
 
+        print(f"Raster shape: {self.raster.shape[:2]}")
+        print(f"Mask shape: {self.raster_mask.shape[:2]}")
         print("Overlaying mask...")
         binary_mask = (self.raster_mask > 0).astype(np.uint8) * 255
         contours, hierarchy = cv2.findContours(
