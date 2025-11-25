@@ -1,8 +1,8 @@
 from utils.dataset import ImageDataset
 from utils.collate_fn import collate_fn
-
 from torch.utils.data import DataLoader
 
+# Generate train loader
 def get_train_loader(data_dir,
                batch_size,
                transform,
@@ -28,6 +28,8 @@ def get_train_loader(data_dir,
 
     return loader
 
+
+# Generate validation loader
 def get_val_loader(data_dir,
                batch_size,
                transform,
