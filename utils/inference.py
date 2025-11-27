@@ -1,5 +1,7 @@
 import torch
 from torchvision import transforms
+import albumentations as A
+from albumentations.pytorch import ToTensorV2
 import cv2
 import numpy as np
 import toml
@@ -71,13 +73,27 @@ class Inference:
         full_w = n_cols * self.tile_size
         classification_raster = np.zeros((full_h, full_w), dtype=np.uint8)
 
+        # Create transform object
+        # requires a dummy normalization step due to tiling fcn. 
+        # (revisit later)
+        transform = A.Compose([
+            A.Normalize(
+                mean=(0, 0, 0),
+                std=(1, 1, 1),
+                max_pixel_value=255.0
+            ),
+            ToTensorV2()
+        ])
+        
         print(f"\tPerforming inference on {n_rows*n_cols} tiles.")
         for i, tile in enumerate(tiles):
 
             # Skip over empty tiles
             if np.max(tile) != 0:
-                transform = transforms.ToTensor()
-                image_tensor = transform(tile).to(self.device)
+                # This loop does inference one at a time. 
+                # Would be useful to put all images in a tensor and classify all directly in future iterations
+                transformed = transform(image=tile)
+                image_tensor = transformed["image"].to(self.device)
                 images = [image_tensor]
 
                 with torch.no_grad():
