@@ -39,6 +39,7 @@ class Inference:
         self.tile_size = params["tile_size"]
         self.score_threshold = params["score_threshold"]
         self.mask_threshold = params["mask_threshold"]
+        self.use_overlap = params.get("use_overlap", False)
 
         # Model
         self.model = get_maskrcnn_model().to(self.device)
@@ -64,7 +65,8 @@ class Inference:
 
         [tiles, coords, dims] = tile_img(
             img,
-            tile_size=self.tile_size
+            tile_size=self.tile_size,
+            overlap=self.use_overlap
         )
 
         # Initialize empty array
@@ -133,10 +135,13 @@ class Inference:
                     tile_mask[mask_bin] = class_label # assign label to masked pixels
 
                 # Place tile_mask into the correct location in the full raster
-                row_idx, col_idx = coords[i]
-                y = row_idx * self.tile_size
-                x = col_idx * self.tile_size
-                classification_raster[y:y+self.tile_size, x:x+self.tile_size] = tile_mask
+                # coords contains (y, x) pixel coordinates directly
+                y, x = coords[i]
+                # Use maximum to combine overlapping regions (relevant when use_overlap=True)
+                classification_raster[y:y+self.tile_size, x:x+self.tile_size] = np.maximum(
+                    classification_raster[y:y+self.tile_size, x:x+self.tile_size],
+                    tile_mask
+                )
 
         # Normalize and write to png
         max_label = classification_raster.max()

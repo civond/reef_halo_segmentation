@@ -10,6 +10,7 @@ output_dir = "./output/"                            # Save directory for mask/ov
 # Parameters
 # ============================
 [Parameters]
-tile_size=800                                       # Tile size (400 is recommended for now)
+tile_size=400                                       # Tile size (400 recommended)
 score_threshold=0.1                                 # Masks to keep
-mask_threshold = 0.1                                # Define what is a mask pixel
+mask_threshold=0.1                                  # Define what is a mask pixel
+use_overlap=true                                    # Add filling tiles at 2x2 intersections
