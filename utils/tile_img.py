@@ -23,7 +23,11 @@ def tile_img(img, tile_size=512, overlap=False):
     pad_h = (tile_size - h % tile_size) % tile_size
     pad_w = (tile_size - w % tile_size) % tile_size
     img_padded = np.pad(img, ((0, pad_h), (0, pad_w), (0, 0)), mode='constant')
-    img_padded = img_padded[:, :, :3]  # Ignore IR channel
+
+    # If more than 3 channels, slice image to
+    print(f"HWC: {h}, {w}, {c}")
+    if c > 3:
+        img_padded = img_padded[:, :, :3]  # Ignore extra channels
 
     tiles = []
     coords = []  # (y, x) pixel coordinates
