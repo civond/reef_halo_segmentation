@@ -23,3 +23,4 @@ n_splits = 5
 random_seed = 42
 patience = 3
 min_delta = 0.001
+score_threshold = 0.5

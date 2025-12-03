@@ -5,6 +5,7 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 # Custom functions
 from utils.trainer import Trainer
+from utils.kfold_trainer import KFoldTrainer
 from utils.inference import Inference
 
 def parse_args():
@@ -36,7 +37,9 @@ def main():
 
     # Cross Validation
     if mode.lower() == "crossval":
-        pass
+        print("Running k-fold cross-validation...")
+        kfold_trainer = KFoldTrainer(config_path)
+        kfold_trainer.train_kfold()
 
     # Inference
     if mode.lower() == "inference":
