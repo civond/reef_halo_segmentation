@@ -42,8 +42,8 @@ class ImageDataset(Dataset):
             mask = augmented['mask']
             mask = mask.unsqueeze(0) # This will transform mask dimmensions from [height, width] --> [1, height, width]
 
-            image = image.float() / 255.0
-            mask = mask.float()
+            #image = image.float() / 255.0
+            #mask = mask.float()
 
 
         # Calculate bounding box from augmented mask
