@@ -23,11 +23,11 @@ class Inference:
         # Paths
         paths = self.config["Paths"]
         self.model_pth = paths["model_pth"]
-        self.tif_pth = paths["tif_pth"]
+        self.img_pth = paths["img_pth"]
 
         # Assert path
-        if not self.tif_pth.lower().endswith(".tif"):
-            print(f"Error: Expected .tif file, got: {self.tif_pth}")
+        if not self.img_pth.lower().endswith((".tif", ".png")):
+            print(f"Error: Expected .tif or .png file, got: {self.img_pth}")
             sys.exit(1)
 
         # Ensure output dir is created
@@ -50,14 +50,22 @@ class Inference:
         self.raster = None
         self.raster_mask = None
     
-    def process_tif(self):
-        [img, profile] = load_tif(tif_pth=self.tif_pth)
-        img = np.transpose(img, (1, 2, 0))  # transpose from (C, H, W) ---> (H, W, C)
-        for i in range(4):
-            img[:, :, i] = cv2.normalize(img[:, :, i], None, 0, 255, cv2.NORM_MINMAX)
-            img = img.astype('uint8')
-        img = img[:,:,:3]
-        img = img[..., ::-1]
+    def process_img(self):
+        if self.img_pth.endswith(".png"):
+            img = cv2.imread(self.img_pth)
+            #img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+        else:
+            [img, profile] = load_tif(tif_pth=self.img_pth)
+            img = np.transpose(img, (1, 2, 0))  # transpose from (C, H, W) ---> (H, W, C)
+        
+            for i in range(4):
+                img[:, :, i] = cv2.normalize(img[:, :, i], None, 0, 255, cv2.NORM_MINMAX)
+                img = img.astype('uint8')
+
+        # THESE TWO LINES ARE REQUIRED FOR THE ORIGINAL TEST IMAGE
+        #img = img[:,:,:3]
+        #img = img[..., ::-1]
 
         # Save img in self.raster
         self.raster = img

@@ -44,7 +44,7 @@ def main():
     # Inference
     if mode.lower() == "inference":
         inf = Inference(config_path)
-        inf.process_tif()
+        inf.process_img()
         inf.overlay_mask()
 
 
