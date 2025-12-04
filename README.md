@@ -14,7 +14,7 @@ This tool extracts reef halo features (ex: clear sand rings surrounding reef pat
 
 <div>
 <h2>Training Procedure:</h2>
-<p>Model training was performed on a NVIDIA RTX A6000 GPU with the AdamW optimizer. To prevent gradient explosion and stable convergence, we applied gradient clipping $(c = 1.0)$, momentum $(\beta_1 = 0.9$ and $\beta_2 = 0.999)$, and weight decay $(\lambda = 1 \times 10^{-4})$ with $batch\_size = 128$ and $LR = 1x10^-5$. Loss and Dice scores were computed across training epochs, indicating smooth and stable convergence (figure 1).</p>
+<p>Model training was performed on a NVIDIA RTX A6000 GPU with the AdamW optimizer. To prevent gradient explosion and stable convergence, we applied gradient clipping $(c = 1.0)$, momentum $(\beta_1 = 0.9$ and $\beta_2 = 0.999)$, and weight decay $(\lambda = 1 \times 10^{-4})$ with $batch\_size = 128$ and $LR = 1x10^{-5}$. Loss and Dice scores were computed across training epochs, indicating smooth and stable convergence (figure 1).</p>
     
 <p>An early stopping mechanism $(p=3)$ based on the validation loss was applied to prevent overfitting with a minimum improvement threshold of $min\_delta= 0.001$.</p>
 
