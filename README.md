@@ -6,9 +6,9 @@
 
 <div>
 <p>
-This repository contains a complete deep-learning workflow for automated coral reef halo segmentation using high-resolution satellite imagery.Originally implemented in ArcGIS, the pipeline has been reimplemented here with PyTorch to create an open-source method for large-scale ecological monitoring.
+This repository contains a complete deep-learning workflow for automated coral reef halo segmentation using high-resolution satellite imagery with Mask R-CNN. Originally implemented in ArcGIS, the pipeline has been reimplemented here with PyTorch to create an open-source method for large-scale ecological monitoring. This tool is being used to train the model that is implemented in our <a href="https://huggingface.co/spaces/civond/coral_reef_segmentation">web application</a> (work in progress).
    
-This tool extracts reef halo features (ex: clear sand rings surrounding reef patches), which are important indicators of reef health, herbivory pressure, and predator–prey dynamics. The workflow is based on a Mask R-CNN model trained on a curated dataset of manually annotated halos collected from diverse reef environments. The codebase includes all stages of the pipeline, from data preprocessing and augmentation to model training, validation, and inference. Once trained, the model can be used to generate segmentation masks for new satellite scenes, and the provided post-processing functions convert these predictions into clean polygons and GIS-ready outputs.
+The model is trained to extract reef halo features (ex: clear sand rings surrounding reef patches), which are important indicators of reef health, herbivory pressure, and predator–prey dynamics. The training dataset consists of manually annotated halos collected from diverse reef environments. The codebase includes all stages of the pipeline, from data preprocessing, model training, validation, inference, and a cross validation function to evaluate the quality of the dataset. After training, our model can be used for semantic segmentation of coral reef halos from unseen satellite images.
 </p>
 </div>
 
@@ -65,10 +65,10 @@ Upon exiting the train loop, timestamped logs, figures, and model will be output
                 <a href="https://www.sciencedirect.com/science/article/pii/S0034425723001359">Original author</a>
             </li>
             <li>
-                Dorian Yeh: Model workflow implementation
+                Dorian Yeh: Model workflow implementation, experimentation
             </li>
             <li>
-                Justin J.K. Hill: Cross validation
+                Justin J.K. Hill: Cross validation and inference utils
             </li>
         </ul>
 </div>
