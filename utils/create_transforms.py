@@ -30,6 +30,11 @@ def create_train_transforms(IMAGE_HEIGHT, IMAGE_WIDTH):
             contrast_limit=0.2,         # +/- 20% contrast shift
             p=0.5                       # 50% probability
         ),
+        A.Normalize(
+            mean=(0, 0, 0),
+            std=(1, 1, 1),
+            max_pixel_value=255.0
+        ),
         ToTensorV2()
     ], additional_targets={'mask': 'mask'})
         
@@ -44,6 +49,11 @@ def create_val_transforms(IMAGE_HEIGHT, IMAGE_WIDTH):
         A.Resize(
             IMAGE_HEIGHT, 
             IMAGE_WIDTH
+        ),
+        A.Normalize(
+            mean=(0, 0, 0),
+            std=(1, 1, 1),
+            max_pixel_value=255.0
         ),
         ToTensorV2()
     ], additional_targets={'mask': 'mask'})
