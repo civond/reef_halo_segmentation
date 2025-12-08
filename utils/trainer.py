@@ -10,8 +10,8 @@ os.environ["QT_QPA_PLATFORM"] = "xcb"
 # Custom functions
 from utils.create_fig import create_fig
 from utils.get_maskrcnn_model import get_maskrcnn_model
-from utils.create_transforms import create_train_transforms, create_val_transforms
-from utils.get_loader import get_train_loader, get_val_loader
+from utils.create_transforms import create_transforms
+from utils.get_loader import get_loader, get_train_loader, get_val_loader
 from utils.train_fn import train_fn
 from utils.val_fn import val_fn
 
@@ -30,7 +30,7 @@ class Trainer:
         self.image_height = hp["image_height"]
         self.image_width = hp["image_width"]
         self.pin_memory = hp["pin_memory"]
-        self.train_flag = hp["train"]
+        #self.train_flag = hp["train"]
         self.patience = hp["patience"]
         self.min_delta = hp["min_delta"]
         self.score_threshold = hp["score_threshold"]
@@ -69,16 +69,19 @@ class Trainer:
         self.patience_counter = 0
 
         # Transforms
-        self.train_transform = create_train_transforms(
+        self.train_transform = create_transforms(
             self.image_height, 
-            self.image_width
+            self.image_width,
+            train=True
         )
-        self.val_transform = create_val_transforms(
+        self.val_transform = create_transforms(
             self.image_height, 
-            self.image_width)
+            self.image_width,
+            train=False
+        )
         
         # Dataloaders
-        self.train_loader = get_train_loader(
+        self.train_loader = get_loader(
             data_dir=self.train_dir,
             batch_size=self.batch_size,
             transform=self.train_transform,
@@ -87,7 +90,7 @@ class Trainer:
             pin_memory=self.pin_memory
         )
 
-        self.val_loader = get_val_loader(
+        self.val_loader = get_loader(
             data_dir=self.val_dir,
             batch_size=self.batch_size,
             transform=self.val_transform,

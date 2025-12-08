@@ -1,10 +1,10 @@
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
 
-# Create transforms object for training
-def create_train_transforms(IMAGE_HEIGHT, IMAGE_WIDTH):
-    
-    transform = A.Compose([
+# Create transform object for training and validation/inference
+def create_transforms(IMAGE_HEIGHT, IMAGE_WIDTH, train=True):
+    if train == True:
+        transform = A.Compose([
         A.Resize(
             IMAGE_HEIGHT, 
             IMAGE_WIDTH
@@ -36,16 +36,10 @@ def create_train_transforms(IMAGE_HEIGHT, IMAGE_WIDTH):
             max_pixel_value=255.0
         ),
         ToTensorV2()
-    ], additional_targets={'mask': 'mask'})
-        
-        
-    return transform
+        ], additional_targets={'mask': 'mask'})
 
-
-# Create transform object for validation
-def create_val_transforms(IMAGE_HEIGHT, IMAGE_WIDTH):
-
-    transform = A.Compose([
+    else:
+        transform = A.Compose([
         A.Resize(
             IMAGE_HEIGHT, 
             IMAGE_WIDTH
@@ -56,6 +50,6 @@ def create_val_transforms(IMAGE_HEIGHT, IMAGE_WIDTH):
             max_pixel_value=255.0
         ),
         ToTensorV2()
-    ], additional_targets={'mask': 'mask'})
-    
+        ], additional_targets={'mask': 'mask'})
+
     return transform
