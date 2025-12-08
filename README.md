@@ -85,7 +85,7 @@ Upon exiting the train loop, timestamped logs, figures, and model will be output
         <ul>
             <li>
                 Simone Franceschini:
-                <a href="https://www.sciencedirect.com/science/article/pii/S0034425723001359">Original author</a>
+                <a href="https://www.sciencedirect.com/science/article/pii/S0034425723001359">Original author</a>, web application implementation
             </li>
             <li>
                 Dorian Yeh: Model workflow implementation, experimentation
