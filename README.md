@@ -13,6 +13,20 @@ The model is trained to extract reef halo features (ex: clear sand rings surroun
 </div>
 
 <div>
+<h2>Results:</h2>
+<p>
+Our model sucessfully segments halos from previously unseen satellite images with reasonable accuracy (figures below). However, the generated masks are not perfect. In future iterations, we aim to improve the quality of our training labels in addition to enhancing image contrast by converting images to grayscale and applying the CLAHE algorithm.
+</p>
+<div align="center">
+    <img src="./figures/egypt1.png" width=500px>
+</div>
+
+<div align="center">
+    <img src="./figures/egypt1_mask.png" width=500px>
+</div>
+</div>
+
+<div>
 <h2>Training Procedure:</h2>
 <p>Model training was performed on a NVIDIA RTX A6000 GPU with the AdamW optimizer. To prevent gradient explosion and ensure stable convergence, we applied gradient clipping $(c = 1.0)$, momentum $(\beta_1 = 0.9$ and $\beta_2 = 0.999)$, and weight decay $(\lambda = 1 \times 10^{-4})$ with $batch\_size = 128$ and $LR = 1 \times 10^{-5}$. Loss and Dice scores were computed across training epochs, indicating smooth and stable convergence (figure 1).</p>
     
