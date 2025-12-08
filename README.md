@@ -71,6 +71,13 @@ Upon exiting the train loop, timestamped logs, figures, and model will be output
 
 </div>
 
+<div>
+    <h3>Run Cross Validation</h3>
+
+    python main.py crossval ./config/kfold_settings.toml
+
+</div>
+
 
 
 <div>
