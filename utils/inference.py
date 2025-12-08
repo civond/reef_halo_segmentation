@@ -51,17 +51,24 @@ class Inference:
         self.raster_mask = None
     
     def process_img(self):
+
+        # ------ EXPECTS a 3-channel RGB .png ------
         if self.img_pth.endswith(".png"):
             img = cv2.imread(self.img_pth)
-            #img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
+        # ------ EXPECTS a uint16, 4-channel .tif file ------
+        # Would be ideal to convert to grayscale -> CLAHE in the future
         else:
             [img, profile] = load_tif(tif_pth=self.img_pth)
-            img = np.transpose(img, (1, 2, 0))  # transpose from (C, H, W) ---> (H, W, C)
-        
-            for i in range(4):
-                img[:, :, i] = cv2.normalize(img[:, :, i], None, 0, 255, cv2.NORM_MINMAX)
-                img = img.astype('uint8')
+            img = np.transpose(img, (1, 2, 0))                              # transpose from (C, H, W) ---> (H, W, C)
+            
+            img = img[:, :, :3]                                             # Clip 4th channel
+            img = img.astype(np.float32)
+            max_val = np.max(img)
+            img = img / max_val                                             # Normalize image between 0-1
+            img = img * 255                                                 # Multiply by 255 to restore range
+            img = img.astype(np.uint8)                                      # uint8 img
+            
 
         # THESE TWO LINES ARE REQUIRED FOR THE ORIGINAL TEST IMAGE
         #img = img[:,:,:3]
