@@ -12,7 +12,7 @@ os.environ["QT_QPA_PLATFORM"] = "xcb"
 # Custom functions
 from utils.create_fig import create_fig
 from utils.get_maskrcnn_model import get_maskrcnn_model
-from utils.create_transforms import create_train_transforms, create_val_transforms
+from utils.create_transforms import create_transforms
 from utils.dataset import ImageDataset
 from utils.collate_fn import collate_fn
 from utils.train_fn import train_fn
@@ -57,13 +57,15 @@ class KFoldTrainer:
         os.makedirs(self.save_fig_dir, exist_ok=True)
 
         # Transforms
-        self.train_transform = create_train_transforms(
+        self.train_transform = create_transforms(
             self.image_height,
-            self.image_width
+            self.image_width,
+            train=True
         )
-        self.val_transform = create_val_transforms(
+        self.val_transform = create_transforms(
             self.image_height,
-            self.image_width
+            self.image_width,
+            train=False
         )
 
         # Create datasets (same data, different transforms)

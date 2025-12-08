@@ -19,4 +19,4 @@ pin_memory = true
 train = true
 patience = 3                    # Number of attempts before early stop
 min_delta = 0.001               # Minimum change in val_loss 
-score_threshold=0.001           # Used to calculate val dice score
+score_threshold=0.5             # Used to calculate val dice score
