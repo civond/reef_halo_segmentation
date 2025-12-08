@@ -11,7 +11,7 @@ os.environ["QT_QPA_PLATFORM"] = "xcb"
 from utils.create_fig import create_fig
 from utils.get_maskrcnn_model import get_maskrcnn_model
 from utils.create_transforms import create_transforms
-from utils.get_loader import get_loader, get_train_loader, get_val_loader
+from utils.get_loader import get_loader
 from utils.train_fn import train_fn
 from utils.val_fn import val_fn
 
