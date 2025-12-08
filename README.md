@@ -15,14 +15,16 @@ The model is trained to extract reef halo features (ex: clear sand rings surroun
 <div>
 <h2>Results:</h2>
 <p>
-Our model sucessfully segments halos from previously unseen satellite images with reasonable accuracy (figures below). However, the generated masks are not perfect. In future iterations, we aim to improve the quality of our training labels in addition to enhancing image contrast by converting images to grayscale and applying the CLAHE algorithm.
+Our model sucessfully segments halos from previously unseen satellite images with reasonable accuracy (see figures below). However, the generated masks are not perfect. Given the Dice score observed during training (see training procedure), this result is expected producing usable masks currently requires a low confidence threshold during inference.
+
+In future iterations, we aim to improve the quality of our training labels in addition to enhancing image contrast by converting images to grayscale and applying the CLAHE algorithm.
 </p>
 <div align="center">
-    <img src="./figures/egypt1.png" width=500px>
+    <img src="./figures/egypt1.png" width=600px>
 </div>
 
 <div align="center">
-    <img src="./figures/egypt1_mask.png" width=500px>
+    <img src="./figures/egypt1_mask.png" width=600px>
 </div>
 </div>
 
