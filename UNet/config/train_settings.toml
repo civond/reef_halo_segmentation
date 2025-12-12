@@ -1,0 +1,22 @@
+# ============================
+# Dataset Directories
+# ============================
+[Paths]
+train_data_dir = "./UNet/data_train/"
+val_data_dir =  "./UNet/data_val/"
+
+# ============================
+# Hyperparameters
+# ============================
+[Hyperparameters]
+learning_rate = 1e-3        
+batch_size = 32                 # If using lab computer, 128 is recommended
+num_epochs = 50                 # Can set to arbitrarily high number
+num_workers = 8                 # ~ 1 per CPU core
+image_height = 256      
+image_width = 256
+pin_memory = true
+train = true
+patience = 3                    # Number of attempts before early stop
+min_delta = 0.001               # Minimum change in val_loss 
+score_threshold=0.5             # Used to calculate val dice score

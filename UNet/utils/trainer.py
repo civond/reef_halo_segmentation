@@ -1,15 +1,15 @@
 import torch
 from torch.optim import AdamW
-import argparse
 import pandas as pd
 from datetime import datetime
 import toml
 import os
+import segmentation_models_pytorch as smp
+import torch.nn as nn
 os.environ["QT_QPA_PLATFORM"] = "xcb"
 
 # Custom functions
 from utils.create_fig import create_fig
-from utils.get_maskrcnn_model import get_maskrcnn_model
 from utils.create_transforms import create_transforms
 from utils.get_loader import get_loader
 from utils.train_fn import train_fn
@@ -30,7 +30,6 @@ class Trainer:
         self.image_height = hp["image_height"]
         self.image_width = hp["image_width"]
         self.pin_memory = hp["pin_memory"]
-        #self.train_flag = hp["train"]
         self.patience = hp["patience"]
         self.min_delta = hp["min_delta"]
         self.score_threshold = hp["score_threshold"]
@@ -39,9 +38,9 @@ class Trainer:
         paths = self.config["Paths"]
         self.train_dir = paths["train_data_dir"]
         self.val_dir = paths["val_data_dir"]
-        self.save_model_dir = "./MaskRCNN/model/"
-        self.save_csv_dir = "./MaskRCNN/logs/"
-        self.save_fig_dir = "./MaskRCNN/figures/"
+        self.save_model_dir = "./UNet/model/"
+        self.save_csv_dir = "./UNet/logs/"
+        self.save_fig_dir = "./UNet/figures/"
 
         # Ensure directories exist
         os.makedirs(self.save_model_dir, exist_ok=True)
@@ -49,7 +48,12 @@ class Trainer:
         os.makedirs(self.save_fig_dir, exist_ok=True)
 
         # Model
-        self.model = get_maskrcnn_model().to(self.device)
+        self.model = smp.Unet(
+            'efficientnet-b3', 
+            encoder_weights='imagenet',
+            classes=3,
+            activation=None
+        ).to(self.device)
 
         # Optimizer
         self.optimizer = AdamW(
@@ -58,6 +62,9 @@ class Trainer:
             betas=(0.9, 0.999),
             weight_decay=1e-4
         )
+
+        # Loss Function
+        self.loss_function = nn.CrossEntropyLoss()
 
         # Metric tracking
         self.train_loss_arr = []
@@ -105,15 +112,18 @@ class Trainer:
 
 
             # Train
-            train_loss = train_fn(
+            [train_loss, train_dice] = train_fn(
                 device=self.device, 
                 loader=self.train_loader, 
                 model=self.model, 
-                optimizer=self.optimizer
+                optimizer=self.optimizer,
+                loss_fn=self.loss_function
             )
 
             print(f"\tAvg. Train Loss: {train_loss}")
+            print(f"\tAvg. Train Dice: {train_dice}")
             self.train_loss_arr.append(train_loss)
+            self.train_dice_arr.append(train_dice)
 
 
             # Validation
@@ -121,6 +131,7 @@ class Trainer:
                 device=self.device, 
                 loader=self.val_loader, 
                 model=self.model,
+                loss_fn=self.loss_function,
                 score_threshold=self.score_threshold
             )
 
@@ -161,6 +172,7 @@ class Trainer:
             print(f"\tSaving csv at: {save_csv_pth}")
             df = pd.DataFrame({
                 "train_loss": self.train_loss_arr, 
+                "train_dice": self.train_dice_arr, 
                 "val_loss": self.val_loss_arr,
                 "val_dice": self.val_dice_arr
             })
