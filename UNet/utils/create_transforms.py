@@ -25,10 +25,6 @@ def create_transforms(IMAGE_HEIGHT, IMAGE_WIDTH, train=True):
 
     else:
         transform = A.Compose([
-        A.Resize(
-            IMAGE_HEIGHT, 
-            IMAGE_WIDTH
-        ),
         A.Normalize(
             mean=(0, 0, 0),
             std=(1, 1, 1),

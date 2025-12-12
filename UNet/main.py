@@ -6,7 +6,7 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 # Custom functions
 from utils.trainer import Trainer
 #from utils.kfold_trainer import KFoldTrainer
-#from utils.inference import Inference
+from utils.inference import Inference
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Train segmentation model")

@@ -2,15 +2,14 @@
 # Paths
 # ============================
 [Paths]
-model_pth = "./model/model_good.pth"                # Path to model
-img_pth = "./data_test/belieze.tif"                 # Path to tif raster file
+model_pth = "./UNet/model/2025_12_12_0003.pth"                # Path to model
+img_pth = "./UNet/data_test/img/000000008.png"                 # Path to tif raster file
 output_dir = "./output/"                            # Save directory for mask/overlayed outputs
 
 # ============================
 # Parameters
 # ============================
 [Parameters]
-tile_size=400                                       # Tile size (400 recommended)
-score_threshold=0.2                                 # Masks to keep
+tile_size=256                                       # Tile size (400 recommended)
 mask_threshold=0.5                                  # Define what is a mask pixel
 use_overlap=true                                    # Add filling tiles at 2x2 intersections
