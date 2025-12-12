@@ -1,12 +1,16 @@
 <h1>Coral Reef Halo Segmentation</h1>
 
 <div align="center">
-    <img src="./figures/img.png" width=300px> <img src="./figures/mask.png" width=300px>
+    <img src="./figures/img_MASKRCNN.png" width=300px> <img src="./figures/mask_MASKRCNN.png" width=300px>
+</div>
+
+<div align="center">
+    <img src="./figures/img_UNET.png" width=300px> <img src="./figures/mask_UNET.png" width=300px>
 </div>
 
 <div>
 <p>
-This repository contains a complete deep-learning workflow for automated coral reef halo segmentation using high-resolution satellite imagery with Mask R-CNN. Originally implemented in ArcGIS, the pipeline has been reimplemented here with PyTorch to create an open-source method for large-scale ecological monitoring. This tool is being used to train the model that is implemented in our <a href="https://huggingface.co/spaces/civond/coral_reef_segmentation">web application</a> (work in progress).
+This repository contains a two-stage workflow for automated coral reef halo segmentation using high-resolution satellite imagery with Mask R-CNN and U-Net. Originally implemented in ArcGIS, the pipeline has been reimplemented here with PyTorch to create an open-source method for large-scale ecological monitoring. This tool is being used to train the model that is implemented in our <a href="https://huggingface.co/spaces/civond/coral_reef_segmentation">web application</a> (work in progress).
    
 The model is trained to extract reef halo features (ex: clear sand rings surrounding reef patches), which are important indicators of reef health, herbivory pressure, and predator–prey dynamics. The training dataset consists of manually annotated halos collected from diverse reef environments. The codebase includes all stages of the pipeline, from data preprocessing, model training, validation, inference, and a cross validation function to evaluate the quality of the dataset. After training, our model can be used for semantic segmentation of coral reef halos from unseen satellite images.
 </p>
