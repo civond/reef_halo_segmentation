@@ -1,3 +1,6 @@
+# =========== Written by Dorian Yeh =============
+# To execute, input python main.py [flag] [config path] in the command line
+
 import argparse
 import os
 os.environ["QT_QPA_PLATFORM"] = "xcb"

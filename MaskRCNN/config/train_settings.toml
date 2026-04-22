@@ -2,8 +2,6 @@
 # Dataset Directories
 # ============================
 [Paths]
-#train_data_dir = "./MaskRCNN/data_train/"
-#val_data_dir =  "./MaskRCNN/data_val/"
 dataset_path = "./MaskRCNN/balanced.csv"
 
 # ============================
