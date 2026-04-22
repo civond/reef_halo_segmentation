@@ -47,14 +47,6 @@ In future iterations, we aim to improve the quality of our training labels in ad
 
 <h2>Usage:</h2>
 <div>
-    During training, this data folder structure is expected: 
-    
-    
-    data_dir/
-    ├── img/
-    └── mask/
-    
-
 Upon exiting the train loop, timestamped logs, figures, and model will be outputted in ./logs/ ./figures/ ./model/ respectively. During inference, a raster in the .tif format is required.
 </div>
 
@@ -85,17 +77,22 @@ Upon exiting the train loop, timestamped logs, figures, and model will be output
 
 
 <div>
-    <h2>Collaborators:</h2>
-        <ul>
-            <li>
-                Simone Franceschini:
-                <a href="https://www.sciencedirect.com/science/article/pii/S0034425723001359">Original author</a>, web application implementation
-            </li>
-            <li>
-                Dorian Yeh: Model workflow implementation, experimentation
-            </li>
-            <li>
-                Justin J.K. Hill: Cross validation and inference utils
-            </li>
-        </ul>
+    <h2>Contributions:</h2>
+    <b>Dorian Yeh</b>: 
+    <ul>
+        <li>Primary developer</li>
+        <li>Pytorch training/evaluation implementation</li>
+        <li>Data annotation</li>
+    </ul>
+    <b>Simone Franceschini</b>:
+    <ul>
+        <li>Scientific project lead</li>
+        <li>Web application implementation</li>
+        <li>Data annotation</li>
+    </ul>
+    <b>Justin J.K. Hill</b>:
+    <ul>
+        <li>Cross validation and inference utils</li>
+        <li>Data annotation</li>
+    </ul>
 </div>
