@@ -22,23 +22,25 @@ class Trainer:
         print("Device:", self.device)
 
         # Hyperparameters
-        hp = self.config["Hyperparameters"]
-        self.learning_rate = hp["learning_rate"]
-        self.batch_size = hp["batch_size"]
-        self.num_epochs = hp["num_epochs"]
-        self.num_workers = hp["num_workers"]
-        self.image_height = hp["image_height"]
-        self.image_width = hp["image_width"]
-        self.pin_memory = hp["pin_memory"]
-        #self.train_flag = hp["train"]
-        self.patience = hp["patience"]
-        self.min_delta = hp["min_delta"]
-        self.score_threshold = hp["score_threshold"]
+        hyperparameters = self.config["Hyperparameters"]
+        self.learning_rate = hyperparameters["learning_rate"]
+        self.batch_size = hyperparameters["batch_size"]
+        self.num_epochs = hyperparameters["num_epochs"]
+        self.num_workers = hyperparameters["num_workers"]
+        self.image_height = hyperparameters["image_height"]
+        self.image_width = hyperparameters["image_width"]
+        self.pin_memory = hyperparameters["pin_memory"]
+        self.patience = hyperparameters["patience"]
+        self.min_delta = hyperparameters["min_delta"]
+        self.score_threshold = hyperparameters["score_threshold"]
 
-        # Paths
+        # Import dataset
         paths = self.config["Paths"]
-        self.train_dir = paths["train_data_dir"]
-        self.val_dir = paths["val_data_dir"]
+        self.dataset = pd.read_csv(paths["dataset_path"])
+        df_train = self.dataset[self.dataset["fold"].isin([0, 1, 2, 3])]
+        df_valid = self.dataset[self.dataset["fold"] == 4]
+
+        # Save output file locations
         self.save_model_dir = "./MaskRCNN/model/"
         self.save_csv_dir = "./MaskRCNN/logs/"
         self.save_fig_dir = "./MaskRCNN/figures/"
@@ -68,7 +70,7 @@ class Trainer:
         self.best_model_weights = None
         self.patience_counter = 0
 
-        # Transforms
+        # Create transforms objects
         self.train_transform = create_transforms(
             self.image_height, 
             self.image_width,
@@ -80,9 +82,9 @@ class Trainer:
             train=False
         )
         
-        # Dataloaders
+        # Create dataloaders
         self.train_loader = get_loader(
-            data_dir=self.train_dir,
+            df=df_train,
             batch_size=self.batch_size,
             transform=self.train_transform,
             num_workers=self.num_workers,
@@ -91,7 +93,7 @@ class Trainer:
         )
 
         self.val_loader = get_loader(
-            data_dir=self.val_dir,
+            df=df_valid,
             batch_size=self.batch_size,
             transform=self.val_transform,
             num_workers=self.num_workers,

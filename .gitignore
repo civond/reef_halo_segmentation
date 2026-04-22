@@ -4,6 +4,8 @@
 *.txt
 *.zip
 *.csv
+*.xml
+*.tfw
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

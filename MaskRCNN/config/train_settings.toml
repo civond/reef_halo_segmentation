@@ -2,19 +2,20 @@
 # Dataset Directories
 # ============================
 [Paths]
-train_data_dir = "./data_train/"
-val_data_dir =  "./data_val/"
+#train_data_dir = "./MaskRCNN/data_train/"
+#val_data_dir =  "./MaskRCNN/data_val/"
+dataset_path = "./MaskRCNN/balanced.csv"
 
 # ============================
 # Hyperparameters
 # ============================
 [Hyperparameters]
 learning_rate = 1e-5        
-batch_size = 32                 # If using lab computer, 128 is recommended
+batch_size = 16                 # If using lab computer, 128 is recommended
 num_epochs = 50                 # Can set to arbitrarily high number
 num_workers = 8                 # ~ 1 per CPU core
-image_height = 400      
-image_width = 400
+image_height = 512      
+image_width = 512
 pin_memory = true
 train = true
 patience = 3                    # Number of attempts before early stop

@@ -3,35 +3,25 @@ import os
 from torch.utils.data import Dataset
 import numpy as np
 import torch
+import pandas as pd
 
 class ImageDataset(Dataset):
-    def __init__(self, data_dir, train=True, transform = None):
-        """
-        data_dir: ./data
-        This function expects subfolders:
-            ./data/img/
-            ./data/mask/
-        """
-        self.data_dir = data_dir
-        self.image_dir = os.path.join(data_dir, "img")
-        self.mask_dir = os.path.join(data_dir, "mask")
+    def __init__(self, df, train=True, transform = None):
+        self.df = df.reset_index(drop=True)
         self.transform = transform
         
-        self.images = sorted([f for f in os.listdir(self.image_dir) if f.endswith(".png")])
-        self.masks = sorted([f for f in os.listdir(self.mask_dir) if f.endswith(".png")])
-        assert len(self.images) == len(self.masks), "Number of images and masks must match"
-
     def __len__(self):
-        return len(self.images)
+        return len(self.df)
 
     def __getitem__(self, index):
-        # Load image
-        img_path = os.path.join(self.image_dir, self.images[index])
-        image = np.array(Image.open(img_path).convert("RGB"))
+        # Index df by row
+        row = self.df.iloc[index]
+        img_path = row["img_path"]
+        mask_path = row["mask_path"]
 
-        # Load mask
-        mask_name = self.masks[index]
-        mask_path = os.path.join(self.mask_dir, mask_name)
+        # Load image data
+        image = np.array(Image.open(img_path).convert("RGB"))
+        mask_name = row["filename"]
         mask = np.array(Image.open(mask_path).convert("L"))
         mask = mask // 255
 
@@ -41,9 +31,6 @@ class ImageDataset(Dataset):
             image = augmented['image']
             mask = augmented['mask']
             mask = mask.unsqueeze(0) # This will transform mask dimmensions from [height, width] --> [1, height, width]
-
-            #image = image.float() / 255.0
-            #mask = mask.float()
 
 
         # Calculate bounding box from augmented mask
@@ -68,6 +55,7 @@ class ImageDataset(Dataset):
             boxes = torch.tensor([[x_min, y_min, x_max, y_max]], dtype=torch.float32)
             labels = torch.ones((1,), dtype=torch.int64)  # Class = 1 for coral
 
+        # Create target dict
         target = {
             "boxes": boxes,
             "labels": labels,
