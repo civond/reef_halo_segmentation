@@ -47,9 +47,15 @@ def main():
     # Inference
     if mode.lower() == "inference":
         inference = Inference(config_path)
-        inference.load_img()
+        inference.load_satellite_img()
         inference.perform_inference()
+        inference.generate_mask()
         inference.overlay_mask()
+
+        # Todo list:
+        # 1. split perform_inference into only inference (GPU/CPU)
+        # 2. write_mask
+        # 3. Overlay mask
 
 
 if __name__ == "__main__":

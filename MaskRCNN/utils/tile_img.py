@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 
-def tile_img(img, tile_size=512, overlap=False):
+def tile_img(img, tile_size=512, overlap=False, verbose=False):
     """
     Tile an image into fixed-size squares.
 
@@ -24,10 +24,9 @@ def tile_img(img, tile_size=512, overlap=False):
     pad_w = (tile_size - w % tile_size) % tile_size
     img_padded = np.pad(img, ((0, pad_h), (0, pad_w), (0, 0)), mode='constant')
 
-    # If more than 3 channels, slice image to
-    print(f"HWC: {h}, {w}, {c}")
+    # Ignore extra channels
     if c > 3:
-        img_padded = img_padded[:, :, :3]  # Ignore extra channels
+        img_padded = img_padded[:, :, :3]
 
     tiles = []
     coords = []  # (y, x) pixel coordinates
@@ -36,9 +35,10 @@ def tile_img(img, tile_size=512, overlap=False):
     n_cols = img_padded.shape[1] // tile_size
     dims = (n_rows, n_cols)
 
-    print(f"\tPadded img shape: {img_padded.shape}")
-    print(f"\tN rows: {dims[0]}")
-    print(f"\tN columns: {dims[1]}")
+    if verbose == True:
+        print(f"\tPadded img shape: {img_padded.shape}")
+        print(f"\tN rows: {dims[0]}")
+        print(f"\tN columns: {dims[1]}")
 
     # Regular tiles (end-to-end, no overlap)
     for row_idx in range(n_rows):
@@ -54,7 +54,7 @@ def tile_img(img, tile_size=512, overlap=False):
         half = tile_size // 2
         n_fill_rows = n_rows - 1
         n_fill_cols = n_cols - 1
-        print(f"\tOverlap enabled: adding {n_fill_rows * n_fill_cols} filling tiles")
+        print(f"\tTile overlap enabled (+{n_fill_rows * n_fill_cols} filling tiles)")
 
         for row_idx in range(n_fill_rows):
             for col_idx in range(n_fill_cols):
