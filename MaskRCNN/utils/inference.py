@@ -249,7 +249,7 @@ class Inference:
         inf_end_time = time.perf_counter() # Inference end time
         elapsed_time = inf_end_time - inf_start_time
         print(f"\tComplete!")
-        print(f"\tElapsed time: {elapsed_time:.4f}s ({(elapsed_time/len(valid_tiles)):.6f}s/sample)")
+        print(f"\tElapsed time: {elapsed_time:.4f} seconds ({(elapsed_time/len(valid_tiles))*1000:.2f} ms/sample)")
     
     # Convert tensors to mask    
     def generate_mask(self):
@@ -294,7 +294,7 @@ class Inference:
             cv2.imwrite(mask_output_pth, mask)
 
     # Overlay mask onto original image and save as .png
-    def overlay_mask(self, alpha=0.2, thickness=-1):
+    def overlay_mask(self, alpha=0.4, thickness=-1):
 
         # Check raster and mask
         if self.raster is None or self.raster_mask is None:
@@ -315,7 +315,7 @@ class Inference:
             overlay,
             contours,
             -1,
-            (0, 0, 255),
+            (161, 141, 255),
             thickness
         )
 
