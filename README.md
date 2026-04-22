@@ -81,7 +81,7 @@ Upon exiting the train loop, timestamped logs, figures, and model will be output
     <b>Dorian Yeh</b>: 
     <ul>
         <li>Primary developer</li>
-        <li>Pytorch training/evaluation implementation</li>
+        <li>PyTorch training/evaluation implementation</li>
         <li>Data annotation</li>
     </ul>
     <b>Simone Franceschini</b>:
