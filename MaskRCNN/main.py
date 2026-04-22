@@ -46,9 +46,10 @@ def main():
 
     # Inference
     if mode.lower() == "inference":
-        inf = Inference(config_path)
-        inf.process_img()
-        inf.overlay_mask()
+        inference = Inference(config_path)
+        inference.load_img()
+        inference.perform_inference()
+        inference.overlay_mask()
 
 
 if __name__ == "__main__":

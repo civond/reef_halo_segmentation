@@ -20,7 +20,9 @@ The model is trained to extract reef halo features (ex: clear sand rings surroun
 <h2>Training Procedure:</h2>
 <p>Model training was performed on a NVIDIA RTX A6000 GPU with the AdamW optimizer. To prevent gradient explosion and ensure stable convergence, we applied gradient clipping $(c = 1.0)$, momentum $(\beta_1 = 0.9$ and $\beta_2 = 0.999)$, and weight decay $(\lambda = 1 \times 10^{-4})$ with $batch\_size = 128$ and $LR = 1 \times 10^{-5}$. Loss and Dice scores were computed across training epochs, indicating smooth and stable convergence (figure 1).</p>
     
-<p>An early stopping mechanism $(p=3)$ based on the validation loss was applied to prevent overfitting with a minimum improvement threshold of $min\_delta= 0.001$.</p>
+<p>
+    To prevent overfitting, an early stopping mechanism $(p=3)$ based on the validation loss was applied with a minimum improvement threshold of $min\_delta= 0.001$.
+</p>
 
 
 </div>
@@ -33,8 +35,6 @@ The model is trained to extract reef halo features (ex: clear sand rings surroun
 <h2>Results:</h2>
 <p>
 Our model sucessfully segments halos from previously unseen satellite images with reasonable accuracy. However, the generated masks are not perfect. Given the Dice score observed during training (see training procedure), this result is expected. Producing usable masks currently requires a low confidence threshold during inference. For the images below, we used a confidence threshold = 0.2.
-
-In future iterations, we aim to improve the quality of our training labels in addition to enhancing image contrast by converting images to grayscale and applying the CLAHE algorithm.
 </p>
 <div align="center">
     <img src="./figures/egypt1.png" width=700px>

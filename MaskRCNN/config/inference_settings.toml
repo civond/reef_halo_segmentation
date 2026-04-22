@@ -2,15 +2,18 @@
 # Paths
 # ============================
 [Paths]
-model_pth = "./model/model_good.pth"                # Path to model
-img_pth = "./data_test/belieze.tif"                 # Path to tif raster file
-output_dir = "./output/"                            # Save directory for mask/overlayed outputs
+model_pth = "./MaskRCNN/model/2026_04_20_1338.pth"                  # Path to model
+img_pth = "./MaskRCNN/data_test/belieze_ez.png"                          # Path to tif raster file
+output_dir = "./MaskRCNN/output/"                                            # Save directory for mask/overlayed outputs
 
 # ============================
 # Parameters
 # ============================
 [Parameters]
-tile_size=400                                       # Tile size (400 recommended)
-score_threshold=0.2                                 # Masks to keep
+rgb_idx=[0,1,2]                                     # RGB idx's
+nir_idx=[3]                                         # NIR_idx
+tile_size=512                                       # Tile size (400 recommended)
+batch_size = 16                                     # Batch size (if using GPU)
+score_threshold=0.5                                 # Masks to keep
 mask_threshold=0.5                                  # Define what is a mask pixel
-use_overlap=true                                    # Add filling tiles at 2x2 intersections
+use_overlap=true                                   # If true, add filling tiles at 2x2 intersections

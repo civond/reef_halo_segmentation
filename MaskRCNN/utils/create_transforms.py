@@ -2,13 +2,12 @@ import albumentations as A
 from albumentations.pytorch import ToTensorV2
 
 # Create transform object for training and validation/inference
-def create_transforms(IMAGE_HEIGHT, IMAGE_WIDTH, train=True):
-    if train == True:
+def create_transforms(mode=None):
+    assert mode in ['train', 'valid', 'inf'], f"Invalid mode: {mode}. Choose from ['train', 'valid', 'inf']."
+    
+    # Training transforms
+    if mode == "train":
         transform = A.Compose([
-        A.Resize(
-            IMAGE_HEIGHT, 
-            IMAGE_WIDTH
-        ),
         A.HorizontalFlip(
             p=0.5                       # 50% probability
         ),
@@ -38,12 +37,9 @@ def create_transforms(IMAGE_HEIGHT, IMAGE_WIDTH, train=True):
         ToTensorV2()
         ], additional_targets={'mask': 'mask'})
 
-    else:
+    # Validation transforms
+    elif mode=="valid":
         transform = A.Compose([
-        A.Resize(
-            IMAGE_HEIGHT, 
-            IMAGE_WIDTH
-        ),
         A.Normalize(
             mean=(0, 0, 0),
             std=(1, 1, 1),
@@ -51,5 +47,16 @@ def create_transforms(IMAGE_HEIGHT, IMAGE_WIDTH, train=True):
         ),
         ToTensorV2()
         ], additional_targets={'mask': 'mask'})
+
+    # Inference transforms
+    else:
+        transform = A.Compose([
+            A.Normalize(
+                mean=(0, 0, 0),
+                std=(1, 1, 1),
+                max_pixel_value=255.0
+            ),
+            ToTensorV2()
+        ])
 
     return transform

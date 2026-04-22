@@ -1,17 +1,16 @@
 import torch
-from torchvision import transforms
-import albumentations as A
-from albumentations.pytorch import ToTensorV2
 import cv2
 import numpy as np
 import toml
-import sys
+from tqdm import tqdm
 import os
 os.environ["QT_QPA_PLATFORM"] = "xcb"
 
 # Custom imports
 from utils.load_tif import load_tif
+from utils.percentile_stretch import percentile_stretch
 from utils.tile_img import tile_img
+from utils.create_transforms import create_transforms
 from utils.get_maskrcnn_model import get_maskrcnn_model
 
 class Inference:
@@ -20,26 +19,26 @@ class Inference:
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         print("Device:", self.device)
 
-        # Paths
+        # Filepaths
         paths = self.config["Paths"]
         self.model_pth = paths["model_pth"]
         self.img_pth = paths["img_pth"]
 
-        # Assert path
-        if not self.img_pth.lower().endswith((".tif", ".png")):
-            print(f"Error: Expected .tif or .png file, got: {self.img_pth}")
-            sys.exit(1)
+        # Confirm .tif or .png format
+        assert self.img_pth.lower().endswith((".tif", ".png")), f"Invalid image format: {self.img_pth}. Expected .tif or .png"
 
-        # Ensure output dir is created
+        # Ensure output dir exists
         self.output_dir = paths["output_dir"]
         os.makedirs(self.output_dir, exist_ok=True)
         
         # Parameters
-        params = self.config["Parameters"]
-        self.tile_size = params["tile_size"]
-        self.score_threshold = params["score_threshold"]
-        self.mask_threshold = params["mask_threshold"]
-        self.use_overlap = params.get("use_overlap", False)
+        parameters = self.config["Parameters"]
+        self.tile_size = parameters["tile_size"]
+        self.score_threshold = parameters["score_threshold"]
+        self.mask_threshold = parameters["mask_threshold"]
+        self.use_overlap = parameters.get("use_overlap", False)
+        self.rgb_idx = parameters["rgb_idx"]
+        self.batch_size = parameters["batch_size"]
 
         # Model
         self.model = get_maskrcnn_model().to(self.device)
@@ -47,39 +46,58 @@ class Inference:
         self.model.eval()
 
         # Images
+        self.img_name = self.img_pth.split('/')[-1]
+        self.img_name = self.img_name.split('.')[0]
+
         self.raster = None
         self.raster_mask = None
     
-    def process_img(self):
-
+    def load_img(self):
         # ------ EXPECTS a 3-channel RGB .png ------
         if self.img_pth.endswith(".png"):
             img = cv2.imread(self.img_pth)
 
         # ------ EXPECTS a uint16, 4-channel .tif file ------
-        # Would be ideal to convert to grayscale -> CLAHE in the future
         else:
-            [img, profile] = load_tif(tif_pth=self.img_pth)
-            img = np.transpose(img, (1, 2, 0))                              # transpose from (C, H, W) ---> (H, W, C)
+            # Load .tif file
+            [img, _] = load_tif(tif_pth=self.img_pth)
+            img = np.transpose(img, (1, 2, 0))          
             
-            img = img[:, :, :3]                                             # Clip 4th channel
-            img = img.astype(np.float32)
-            max_val = np.max(img)
-            img = img / max_val                                             # Normalize image between 0-1
-            img = img * 255                                                 # Multiply by 255 to restore range
-            img = img.astype(np.uint8)                                      # uint8 img
-            
+            # Print per channel values/mean
+            max_vals = np.max(img, axis=(0, 1))
+            print(f"\tChannel max vals: {max_vals}")
+            means = np.mean(img, axis=(0, 1))
+            print("\tChannel means:", means)
 
-        # THESE TWO LINES ARE REQUIRED FOR THE ORIGINAL TEST IMAGE
-        #img = img[:,:,:3]
-        #img = img[..., ::-1]
+
+            # Process .tif
+            img = img[:, :, self.rgb_idx].astype(np.float32)         # Prevents division by zero
+            img = np.where(img == 0, np.nan, img)               # Removes NaN's
+
+            # Perform percentile stretch
+            for i in range(3):
+                img[:, :, i] = percentile_stretch(img[:, :, i], i)
+                
+
+            # Convert invalid values to int and normalize to 255
+            img = np.nan_to_num(
+                img, 
+                nan=0.0, 
+                posinf=0.0, 
+                neginf=0.0
+            )
+            img = (img * 255).astype(np.uint8)
 
         # Save img in self.raster
         self.raster = img
-        [h_img, w_img] = img.shape[:2]
 
-        [tiles, coords, dims] = tile_img(
-            img,
+    # Perform inference on processed image
+    def perform_inference(self):
+        print(f"Tiling: {self.img_pth}.")
+        [h_img, w_img] = self.raster.shape[:2]
+
+        [img, coords, dims] = tile_img(
+            self.raster,
             tile_size=self.tile_size,
             overlap=self.use_overlap
         )
@@ -91,20 +109,83 @@ class Inference:
         classification_raster = np.zeros((full_h, full_w), dtype=np.uint8)
 
         # Create transform object
-        # requires a dummy normalization step due to tiling fcn. 
-        # (revisit later)
-        transform = A.Compose([
-            A.Normalize(
-                mean=(0, 0, 0),
-                std=(1, 1, 1),
-                max_pixel_value=255.0
-            ),
-            ToTensorV2()
-        ])
-        
-        print(f"\tPerforming inference on {n_rows*n_cols} tiles.")
-        for i, tile in enumerate(tiles):
+        transform = create_transforms(mode="inf")
 
+        print(f"Performing inference on {self.img_pth}, ({n_rows*n_cols} tiles).")
+        
+        """# GPU inference
+        if torch.cuda.is_available():
+            valid_tiles = []
+            valid_coords = []
+
+            # If image contains nonzero values, flag as valid for inference
+            for i, tile in enumerate(img):
+                if np.max(tile) != 0:
+                    valid_tiles.append(tile)
+                    valid_coords.append(coords[i])
+
+            # Pre-transform all tiles
+            transformed_tiles = []
+            for tile in valid_tiles:
+                transformed = transform(image=tile)
+                transformed_tiles.append(transformed["image"].to(self.device))
+
+
+            all_outputs = []
+
+        for batch_num, batch_start in enumerate(tqdm(range(0, len(transformed_tiles), self.batch_size), desc="Inference"), start=1):
+            batch = transformed_tiles[batch_start : batch_start + self.batch_size]
+            with torch.no_grad():
+                outputs = self.model(batch)  # list of tensors, not stacked
+            all_outputs.extend(outputs)
+            #print(torch.cuda.memory_summary(abbreviated=True))
+
+        # Post-processing (unchanged)
+        for k, output in enumerate(all_outputs):
+            boxes = output['boxes']
+            labels = output['labels']
+            scores = output['scores']
+            masks = output['masks']
+
+            keep = scores > self.score_threshold
+            masks = masks[keep]
+            labels = labels[keep]
+
+            if len(masks) == 0:
+                continue
+
+            tile_mask = np.zeros((self.tile_size, self.tile_size), dtype=np.uint8)
+
+            for j in range(len(masks)):
+                mask = masks[j, 0].cpu().numpy()
+                mask_bin = mask > self.mask_threshold
+                class_label = labels[j].item()
+                tile_mask[mask_bin] = class_label
+
+            y, x = valid_coords[k]
+
+            classification_raster[y:y+self.tile_size, x:x+self.tile_size] = np.maximum(
+                classification_raster[y:y+self.tile_size, x:x+self.tile_size],
+                tile_mask
+            )
+        # Normalize and write to png
+        max_label = classification_raster.max()
+        mask = (classification_raster / max_label * 255).astype(np.uint8)
+        mask = mask[:h_img, :w_img]
+
+        self.raster_mask = mask
+
+        mask_output_pth = os.path.join(self.output_dir,f"{self.img_name}_pred_mask.png")
+        print(f"\tWriting mask output to: {mask_output_pth}")
+        cv2.imwrite(mask_output_pth, mask)"""
+        
+
+        """# CPU inference
+        if self.device == "cpu":
+            print("blehg")"""
+
+        #input('inferenceadfsadsf')
+        for i, tile in enumerate(img):
             # Skip over empty tiles
             if np.max(tile) != 0:
                 # This loop does inference one at a time. 
@@ -130,11 +211,6 @@ class Inference:
                 labels = labels[keep]
                 masks = masks[keep]
                 scores = scores[keep]
-
-
-                """print(f"masks: {masks}")
-                print(f"boxes: {boxes}")
-                print(f"scores: {scores}")"""
                 
                 # Skip no detections
                 if len(masks) == 0:
@@ -152,6 +228,7 @@ class Inference:
                 # Place tile_mask into the correct location in the full raster
                 # coords contains (y, x) pixel coordinates directly
                 y, x = coords[i]
+                
                 # Use maximum to combine overlapping regions (relevant when use_overlap=True)
                 classification_raster[y:y+self.tile_size, x:x+self.tile_size] = np.maximum(
                     classification_raster[y:y+self.tile_size, x:x+self.tile_size],
@@ -165,7 +242,7 @@ class Inference:
 
         self.raster_mask = mask
 
-        mask_output_pth = os.path.join(self.output_dir,'output_mask.png')
+        mask_output_pth = os.path.join(self.output_dir,f"{self.img_name}_pred_mask.png")
         print(f"\tWriting mask output to: {mask_output_pth}")
         cv2.imwrite(mask_output_pth, mask)
 
@@ -176,11 +253,6 @@ class Inference:
         if self.raster is None or self.raster_mask is None:
             raise ValueError("Run process_tif() before calling overlay_mask().")
         
-        assert self.raster.shape[:2] == self.raster_mask.shape[:2], \
-            f"Raster dimensions {self.raster.shape[:2]} and mask dimensions {self.raster_mask.shape[:2]} do not match"
-
-        print(f"Raster shape: {self.raster.shape[:2]}")
-        print(f"Mask shape: {self.raster_mask.shape[:2]}")
         print("Overlaying mask...")
         binary_mask = (self.raster_mask > 0).astype(np.uint8) * 255
         contours, hierarchy = cv2.findContours(
@@ -203,6 +275,6 @@ class Inference:
         # Fuse with original using alpha blend
         blended = cv2.addWeighted(self.raster, 1 - alpha, overlay, alpha, 0)
 
-        blended_output_pth = os.path.join(self.output_dir,'output_blended.png')
+        blended_output_pth = os.path.join(self.output_dir,f"{self.img_name}_blended.png")
         print(f"\tWriting overlayed image to {blended_output_pth}")
         cv2.imwrite(blended_output_pth, blended)
