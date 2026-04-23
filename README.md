@@ -78,21 +78,57 @@ Upon exiting the train loop, timestamped logs, figures, and model will be output
 
 <div>
     <h2>Contributions:</h2>
-    <b>Dorian Yeh</b>: 
-    <ul>
-        <li>Primary developer</li>
-        <li>PyTorch training/evaluation implementation</li>
-        <li>Data annotation</li>
-    </ul>
-    <b>Simone Franceschini</b>:
-    <ul>
-        <li>Scientific project lead</li>
-        <li>Web application implementation</li>
-        <li>Data annotation</li>
-    </ul>
-    <b>Justin J.K. Hill</b>:
-    <ul>
-        <li>Cross validation and inference utils</li>
-        <li>Data annotation</li>
-    </ul>
+    <table>
+    <tr>
+        <td align="center" width=300px style="vertical-align: top;">
+            <div style="width: 170px; margin: 0 auto;">
+                <a href="https://civond.github.io/">
+                <img src="https://github.com/civond.png"
+                    width="150px"
+                    style="border-radius: 10px;"
+                    alt="Dorian Yeh"/>
+                <br>
+                <b>Dorian Yeh</b>
+                </a>
+                <ul style="text-align: left; padding-left: 30px; margin-top: 5px;">
+                    <li>Primary developer</li>
+                    <li>PyTorch training & evaluation implementation</li>
+                    <li>Data annotation</li>
+                </ul>
+            </div>
+        </td>
+        <td align="center" width=250px style="vertical-align: top;">
+            <div style="width: 170px; margin: 0 auto;">
+                <a href="https://www.linkedin.com/in/simone-franceschini-phd-868116ab/">
+                <img src="https://github.com/SaimonEco.png" 
+                    width="150px;" 
+                    alt="Simone Franceschini"
+                    style="border-radius: 10px;"
+                /><br />
+                <b>Simone Franceschini</b></a>
+                <ul style="text-align: left; padding-left: 30px; margin-top: 5px;;">
+                    <li>Scientific project lead</li>
+                    <li>Web application implementation</li>
+                    <li>Data annotation</li>
+                </ul>
+            </div>
+        </td>
+        <td align="center" width=250px style="vertical-align: top;">
+            <div style="width: 170px; margin: 0 auto;">
+                <a href="">
+                <img src="https://github.com/just5034.png" 
+                    width="150px;" 
+                    alt="Justin JK Hill"
+                    style="border-radius: 10px;"
+                    /><br />
+                <b>Justin J.K. Hill</b></a>
+                <ul style="text-align: left; padding-left: 30px; margin-top: 5px;;">
+                    <li>Scientific project lead</li>
+                    <li>Web application implementation</li>
+                    <li>Data annotation</li>
+                </ul>
+            </div>
+        </td>
+    </tr>
+    </table>
 </div>
