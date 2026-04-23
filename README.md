@@ -32,17 +32,13 @@ The model is trained to extract reef halo features (ex: clear sand rings surroun
 </div>
 
 <div>
-<h2>Results:</h2>
-<p>
-Our model sucessfully segments halos from previously unseen satellite images with reasonable accuracy. However, the generated masks are not perfect. Given the Dice score observed during training (see training procedure), this result is expected. Producing usable masks currently requires a low confidence threshold during inference. For the images below, we used a confidence threshold = 0.2.
-</p>
-<div align="center">
-    <img src="./figures/egypt1.png" width=700px>
-</div>
-
-<div align="center">
-    <img src="./figures/egypt1_mask.png" width=700px>
-</div>
+    <h2>Results:</h2>
+    <p>
+    Our MaskRCNN model sucessfully segments halos from previously unseen satellite images with reasonable accuracy. However, the generated masks are not perfect. The Dice score observed during training reached approximately ~0.7 with a confidence threshold of 0.5.
+    </p>
+    <div align="center">
+        <img src="./figures/IMG_0551.png" width=700px>
+    </div>
 </div>
 
 <h2>Usage:</h2>
