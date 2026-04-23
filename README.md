@@ -90,7 +90,7 @@ Upon exiting the train loop, timestamped logs, figures, and model will be output
                 <br>
                 <b>Dorian Yeh</b>
                 </a>
-                <ul style="text-align: left; padding-left: 30px; margin-top: 5px;">
+                <ul style="text-align: left;">
                     <li>Primary developer</li>
                     <li>PyTorch training & evaluation implementation</li>
                     <li>Data annotation</li>
@@ -106,7 +106,7 @@ Upon exiting the train loop, timestamped logs, figures, and model will be output
                     style="border-radius: 10px;"
                 /><br />
                 <b>Simone Franceschini</b></a>
-                <ul style="text-align: left; padding-left: 30px; margin-top: 5px;;">
+                <ul style="text-align: left; padding-left: 30px; margin-top: 5px;">
                     <li>Scientific project lead</li>
                     <li>Web application implementation</li>
                     <li>Data annotation</li>
