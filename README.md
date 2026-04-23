@@ -86,7 +86,7 @@ Upon exiting the train loop, timestamped logs, figures, and model will be output
                 <br>
                 <b>Dorian Yeh</b>
                 </a>
-                <ul style="text-align: left;">
+                <ul align="left" style="text-align: left;">
                     <li>Lead developer</li>
                     <li>PyTorch training & evaluation implementation</li>
                     <li>Data annotation</li>
@@ -102,7 +102,7 @@ Upon exiting the train loop, timestamped logs, figures, and model will be output
                     style="border-radius: 10px;"
                 /><br />
                 <b>Simone Franceschini</b></a>
-                <ul style="text-align: left; margin-top: 5px;">
+                <ul align="left" style="text-align: left; margin-top: 5px;">
                     <li>Scientific project lead</li>
                     <li>Web application implementation</li>
                     <li>Data annotation</li>
@@ -114,11 +114,11 @@ Upon exiting the train loop, timestamped logs, figures, and model will be output
                 <a href="">
                 <img src="https://github.com/just5034.png" 
                     width="150px;" 
-                    alt="Justin JK Hill"
+                    alt="Justin J.K, Hill"
                     style="border-radius: 10px;"
                     /><br />
                 <b>Justin J.K. Hill</b></a>
-                <ul style="text-align: left; margin-top: 5px;">
+                <ul align="left" style="text-align: left; margin-top: 5px;">
                     <li>Tiling and cross validation utils</li>
                     <li>Data annotation</li>
                 </ul>
