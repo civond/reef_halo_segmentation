@@ -87,13 +87,13 @@ Upon exiting the train loop, timestamped logs, figures, and model will be output
                 <b>Dorian Yeh</b>
                 </a>
                 <ul style="text-align: left;">
-                    <li>Primary developer</li>
+                    <li>Lead developer</li>
                     <li>PyTorch training & evaluation implementation</li>
                     <li>Data annotation</li>
                 </ul>
             </div>
         </td>
-        <td align="center" width=250px style="vertical-align: top;">
+        <td align="center" width=300px style="vertical-align: top;">
             <div style="width: 170px; margin: 0 auto;">
                 <a href="https://www.linkedin.com/in/simone-franceschini-phd-868116ab/">
                 <img src="https://github.com/SaimonEco.png" 
@@ -102,14 +102,14 @@ Upon exiting the train loop, timestamped logs, figures, and model will be output
                     style="border-radius: 10px;"
                 /><br />
                 <b>Simone Franceschini</b></a>
-                <ul style="text-align: left; padding-left: 30px; margin-top: 5px;">
+                <ul style="text-align: left; margin-top: 5px;">
                     <li>Scientific project lead</li>
                     <li>Web application implementation</li>
                     <li>Data annotation</li>
                 </ul>
             </div>
         </td>
-        <td align="center" width=250px style="vertical-align: top;">
+        <td align="center" width=300px style="vertical-align: top;">
             <div style="width: 170px; margin: 0 auto;">
                 <a href="">
                 <img src="https://github.com/just5034.png" 
@@ -118,9 +118,8 @@ Upon exiting the train loop, timestamped logs, figures, and model will be output
                     style="border-radius: 10px;"
                     /><br />
                 <b>Justin J.K. Hill</b></a>
-                <ul style="text-align: left; padding-left: 30px; margin-top: 5px;;">
-                    <li>Scientific project lead</li>
-                    <li>Web application implementation</li>
+                <ul style="text-align: left; margin-top: 5px;">
+                    <li>Tiling and cross validation utils</li>
                     <li>Data annotation</li>
                 </ul>
             </div>
