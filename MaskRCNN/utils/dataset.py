@@ -74,11 +74,11 @@ class ImageDataset(Dataset):
         H, W = mask_np.shape
         num_labels, cc = cv2.connectedComponents(mask_np)
         #self.visualize_components(image, mask_np, cc, num_labels)
-
+        
+        # Generate masks for each object
         boxes = []
         labels = []
         masks_out = []
-
         for i in range(1, num_labels):  # skip background
             component = (cc == i).astype(np.uint8)
 
@@ -113,34 +113,5 @@ class ImageDataset(Dataset):
             "labels": labels,
             "masks": masks_out,
         }
-        
-        """# Calculate bounding box from augmented mask
-        pos = torch.where(mask[0] == 1)
-
-        if len(pos[0]) == 0:
-            boxes = torch.zeros((0, 4), dtype=torch.float32)
-            labels = torch.zeros((0,), dtype=torch.int64)
-
-        else:
-            y_min = torch.min(pos[0])
-            y_max = torch.max(pos[0])
-            x_min = torch.min(pos[1])
-            x_max = torch.max(pos[1])
-
-            # Ensure non-zero width/height
-            if y_max == y_min:
-                y_max += 1
-            if x_max == x_min:
-                x_max += 1
-
-            boxes = torch.tensor([[x_min, y_min, x_max, y_max]], dtype=torch.float32)
-            labels = torch.ones((1,), dtype=torch.int64)  # Class = 1 for coral
-
-        # Create target dict
-        target = {
-            "boxes": boxes,
-            "labels": labels,
-            "masks": mask,
-            }"""
 
         return image, target, mask_name
