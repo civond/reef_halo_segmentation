@@ -1,4 +1,5 @@
 import torch
+from torchvision.ops import nms
 import cv2
 import numpy as np
 import toml
@@ -36,6 +37,7 @@ class Inference:
         self.use_cuda = settings["use_cuda"]
         self.rgb_idx = settings["rgb_idx"]
         self.batch_size = settings["batch_size"]
+        self.iou_threshold = settings["iou_threshold"]
 
         # Check cuda availability
         if self.use_cuda:
@@ -195,55 +197,6 @@ class Inference:
 
             self.raster_mask = all_outputs
             self.valid_coords = valid_coords
-    
-            """output = outputs[0]
-            boxes = output['boxes']       # [N,4] bounding boxes
-            labels = output['labels']     # [N] predicted class labels
-            scores = output['scores']     # [N] confidence scores
-            masks = output['masks']       # [N,1,H,W] predicted masks
-
-
-            # Filter predictions by score threshold
-            keep = scores > self.score_threshold
-
-            boxes = boxes[keep]
-            labels = labels[keep]
-            masks = masks[keep]
-            scores = scores[keep]
-            
-            # Skip no detections
-            if len(masks) == 0:
-                continue
-
-            # Combine all masks into a single tile mask
-            tile_mask = np.zeros((self.tile_size, self.tile_size), dtype=np.uint8)
-
-            for j in range(len(masks)):
-                mask = masks[j, 0].cpu().numpy()  # [H,W]
-                mask_bin = mask > self.mask_threshold
-                class_label = labels[j].item()
-                tile_mask[mask_bin] = class_label # assign label to masked pixels
-
-            # Place tile_mask into the correct location in the full raster
-            # coords contains (y, x) pixel coordinates directly
-            y, x = coords[i]
-            
-            # Use maximum to combine overlapping regions (relevant when use_overlap=True)
-            self.classification_raster[y:y+self.tile_size, x:x+self.tile_size] = np.maximum(
-                self.classification_raster[y:y+self.tile_size, x:x+self.tile_size],
-                tile_mask
-            )"""
-
-            """# Normalize and write to png
-            max_label = self.classification_raster.max()
-            mask = (self.classification_raster / max_label * 255).astype(np.uint8)
-            mask = mask[:h_img, :w_img]
-
-            self.raster_mask = mask
-
-            mask_output_pth = os.path.join(self.output_dir,f"{self.img_name}_pred_mask.png")
-            print(f"\tWriting mask output to: {mask_output_pth}")
-            cv2.imwrite(mask_output_pth, mask)"""
 
         # Calculate elapsed time
         inf_end_time = time.perf_counter() # Inference end time
@@ -253,45 +206,71 @@ class Inference:
     
     # Convert tensors to mask    
     def generate_mask(self):
-        # Post-processing (unchanged)
-            for k, output in enumerate(self.raster_mask):
-                boxes = output['boxes']
-                labels = output['labels']
-                scores = output['scores']
-                masks = output['masks']
+        for k, output in enumerate(self.raster_mask):
+            # Model outputs
+            boxes = output['boxes']
+            labels = output['labels']
+            scores = output['scores']
+            masks = output['masks']
 
-                keep = scores > self.score_threshold
-                masks = masks[keep]
-                labels = labels[keep]
+            # Perform non-maximum suppression
+            keep_nms = nms(
+                boxes=boxes,
+                scores=scores,
+                iou_threshold=self.iou_threshold
+            )
+            boxes = boxes[keep_nms]
+            masks = masks[keep_nms]
+            labels = labels[keep_nms]
+            scores = scores[keep_nms]
+            if len(masks) == 0:
+                continue
+            
+            # Filter based on score
+            keep = scores > self.score_threshold
+            masks = masks[keep]
+            labels = labels[keep]
+            if len(masks) == 0:
+                continue
+            
+            # --- Step 1: accumulate score-weighted masks ---
+            tile_score = np.zeros((self.tile_size, self.tile_size), dtype=np.float32)
 
-                if len(masks) == 0:
-                    continue
+            for j in range(len(masks)):
+                mask = masks[j, 0].cpu().numpy()          # float mask (0–1)
+                score = scores[j].item()                  # confidence
 
-                tile_mask = np.zeros((self.tile_size, self.tile_size), dtype=np.uint8)
+                weighted_mask = mask * score              # weight by confidence
+                tile_score = np.maximum(tile_score, weighted_mask)
 
-                for j in range(len(masks)):
-                    mask = masks[j, 0].cpu().numpy()
-                    mask_bin = mask > self.mask_threshold
-                    class_label = labels[j].item()
-                    tile_mask[mask_bin] = class_label
+            # --- Step 2: threshold AFTER fusion ---
+            tile_mask = (tile_score > self.mask_threshold).astype(np.uint8)
+            
+            """tile_mask = np.zeros((self.tile_size, self.tile_size), dtype=np.uint8)
 
-                y, x = self.valid_coords[k]
+            for j in range(len(masks)):
+                mask = masks[j, 0].cpu().numpy()
+                mask_bin = mask > self.mask_threshold
+                class_label = labels[j].item()
+                tile_mask[mask_bin] = class_label"""
 
-                self.classification_raster[y:y+self.tile_size, x:x+self.tile_size] = np.maximum(
-                    self.classification_raster[y:y+self.tile_size, x:x+self.tile_size],
-                    tile_mask
-                )
-            # Normalize and write to png
-            [h_img, w_img] = self.raster.shape[:2]
-            max_label = self.classification_raster.max()
-            mask = (self.classification_raster / max_label * 255).astype(np.uint8)
-            mask = mask[:h_img, :w_img]
+            y, x = self.valid_coords[k]
 
-            self.raster_mask = mask
+            self.classification_raster[y:y+self.tile_size, x:x+self.tile_size] = np.maximum(
+                self.classification_raster[y:y+self.tile_size, x:x+self.tile_size],
+                tile_mask
+            )
+        # Normalize and write to png
+        [h_img, w_img] = self.raster.shape[:2]
+        max_label = self.classification_raster.max()
+        mask = (self.classification_raster / max_label * 255).astype(np.uint8)
+        mask = mask[:h_img, :w_img]
 
-            mask_output_pth = os.path.join(self.output_dir,f"{self.img_name}_pred_mask.png")
-            print(f"\tWriting mask output to: {mask_output_pth}")
-            cv2.imwrite(mask_output_pth, mask)
+        self.raster_mask = mask
+
+        mask_output_pth = os.path.join(self.output_dir,f"{self.img_name}_pred_mask.png")
+        print(f"\tWriting mask output to: {mask_output_pth}")
+        cv2.imwrite(mask_output_pth, mask)
 
     # Overlay mask onto original image and save as .png
     def overlay_mask(self, alpha=0.4, thickness=-1):

@@ -72,14 +72,10 @@ class Trainer:
 
         # Create transforms objects
         self.train_transform = create_transforms(
-            self.image_height, 
-            self.image_width,
-            train=True
+            mode='train'
         )
         self.val_transform = create_transforms(
-            self.image_height, 
-            self.image_width,
-            train=False
+            mode='valid'
         )
         
         # Create dataloaders
