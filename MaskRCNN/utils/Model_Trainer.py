@@ -15,7 +15,7 @@ from utils.get_loader import get_loader
 from utils.train_fn import train_fn
 from utils.val_fn import val_fn
 
-class Trainer:
+class Model_Trainer:
     def __init__(self, config_path: str):
         self.config = toml.load(config_path)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

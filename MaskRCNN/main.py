@@ -6,10 +6,11 @@ import os
 os.environ["QT_QPA_PLATFORM"] = "xcb"
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
-# Custom functions
-from utils.trainer import Trainer
-from utils.kfold_trainer import KFoldTrainer
-from utils.inference import Inference
+# Custom classes
+from MaskRCNN.utils.Model_Trainer import Model_Trainer
+from MaskRCNN.utils.Model_KFoldTrainer import Model_KFoldTrainer
+from MaskRCNN.utils.Model_Inference import Model_Inference
+from MaskRCNN.utils.Model_Evaluation import Model_Evaluation
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Train segmentation model")
@@ -35,22 +36,28 @@ def main():
     # Train
     if mode.lower() == "train":
         print("Running training loop...")
-        trainer = Trainer(config_path)
-        trainer.train_loop()
+        model_trainer = Model_Trainer(config_path)
+        model_trainer.train_loop()
 
     # Cross Validation
     if mode.lower() == "crossval":
         print("Running k-fold cross-validation...")
-        kfold_trainer = KFoldTrainer(config_path)
-        kfold_trainer.train_kfold()
+        model_kfoldtrainer = Model_KFoldTrainer(config_path)
+        model_kfoldtrainer.train_kfold()
 
-    # Inference
+    # Model Evaluation
+    if mode.lower() == "eval":
+        print("Running model eval. using test set...")
+        model_test = Model_Evaluation(config_path)
+        model_test.train_loop()
+
+    # Model Inference on Unseen Data
     if mode.lower() == "inference":
-        inference = Inference(config_path)
-        inference.load_satellite_img()
-        inference.perform_inference()
-        inference.generate_mask()
-        inference.overlay_mask()
+        model_inference = Model_Inference(config_path)
+        model_inference.load_satellite_img()
+        model_inference.perform_inference()
+        model_inference.generate_mask()
+        model_inference.overlay_mask()
 
 if __name__ == "__main__":
     main()

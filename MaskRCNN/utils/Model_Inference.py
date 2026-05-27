@@ -15,7 +15,7 @@ from utils.tile_img import tile_img
 from utils.create_transforms import create_transforms
 from utils.get_maskrcnn_model import get_maskrcnn_model
 
-class Inference:
+class Model_Inference:
     def __init__(self, config_path: str):
         self.config = toml.load(config_path)
 
