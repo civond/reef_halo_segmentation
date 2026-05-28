@@ -29,7 +29,8 @@ class Model_Evaluation:
 
         # Filepaths
         paths = self.config["Paths"]
-        self.dataset = pd.read_csv(paths["dataset_pth"])
+        self.dataset_path = paths["dataset_pth"]
+        self.dataset = pd.read_csv(self.dataset_path)
         self.dataset = self.dataset[self.dataset["fold"] == self.useFold]
         self.model_pth = paths["model_pth"]
 
@@ -69,24 +70,27 @@ class Model_Evaluation:
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         save_dir = os.path.join(self.output_dir, "eval_"+timestamp)
         os.makedirs(save_dir, exist_ok=True)
-        
-        # Output settings used for reproducibility
-        settings_path = os.path.join(save_dir, "settings.txt")
-        with open(settings_path, "w") as f:
-            f.write(f"timestamp       : {timestamp}\n")
-            f.write(f"model_pth       : {self.model_pth}\n")
-            f.write(f"fold            : {self.useFold}\n")
-            f.write(f"score_threshold : {self.score_threshold}\n")
-            f.write(f"mask_threshold  : {self.mask_threshold}\n")
-            f.write(f"iou_threshold   : {self.iou_threshold}\n")
-            f.write(f"batch_size      : {self.batch_size}\n")
 
         # Generate predictions
-        [eval_predictions, eval_dice] = eval_fn(
+        [eval_iou, eval_dice] = eval_fn(
             device=self.device,
             loader=self.eval_loader,
             model=self.model,
             score_threshold=self.score_threshold,
             save_dir=save_dir
         )
+
+        # Output log file with settings used for reproducibility
+        settings_path = os.path.join(save_dir, "log.txt")
+        with open(settings_path, "w") as f:
+            f.write(f"Mean IOU        : {eval_iou}\n")
+            f.write(f"Mean Dice       : {eval_dice}\n")
+            f.write(f"timestamp       : {timestamp}\n")
+            f.write(f"dataset_pth     : {self.dataset_path}\n")
+            f.write(f"model_pth       : {self.model_pth}\n")
+            f.write(f"fold            : {self.useFold}\n")
+            f.write(f"score_threshold : {self.score_threshold}\n")
+            f.write(f"mask_threshold  : {self.mask_threshold}\n")
+            f.write(f"iou_threshold   : {self.iou_threshold}\n")
+            f.write(f"batch_size      : {self.batch_size}\n")
 

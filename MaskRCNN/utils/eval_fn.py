@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import os
 from utils.calculate_dice import calculate_dice
 from utils.calculate_iou import calculate_iou
+import numpy as np
 
 def eval_fn(device, loader, model, score_threshold=0.5, save_dir=None):
     loop = tqdm(loader, desc="Evaluating", leave=False)
@@ -11,6 +12,7 @@ def eval_fn(device, loader, model, score_threshold=0.5, save_dir=None):
     # Track eval predictions and dice score
     eval_predictions = []
     total_dice = 0
+    total_iou = 0
     count=0
 
     # Disable gradient calculation (back prop)
@@ -42,9 +44,15 @@ def eval_fn(device, loader, model, score_threshold=0.5, save_dir=None):
                         pred_mask = masks.max(0)[0]        # (H, W)
                     else:
                         pred_mask = torch.zeros_like(gt_mask)
-    
+
+                # Calculate Dice score and IOU
                 dice = calculate_dice(pred_mask, gt_mask)
                 iou = calculate_iou(pred_mask, gt_mask)
+
+                if gt_mask.sum() > 0:
+                    total_dice += dice
+                    total_iou += iou
+                    count += 1
 
                 # Create visualization
                 fig, axes = plt.subplots(1, 3, figsize=(10, 5))
@@ -67,14 +75,17 @@ def eval_fn(device, loader, model, score_threshold=0.5, save_dir=None):
                 plt.close(fig)
 
 
-                eval_predictions.append({
+                """eval_predictions.append({
                     "filename": filename,
                     "pred_mask": pred_mask,
                     "dice": dice
-                })
+                })"""
 
                 
 
-    avg_dice = total_dice / count if count > 0 else 0.0 # calculate avg dice score
+    avg_dice = total_dice / count
+    avg_iou = total_iou / count
+    print(f"\tAvg. Dice score: {avg_dice:.4f}")
+    print(f"\tAvg. IOU: {avg_iou:.4f}")
 
-    return eval_predictions, avg_dice
+    return avg_iou, avg_dice
