@@ -49,7 +49,7 @@ def main():
     if mode.lower() == "eval":
         print("Running model eval. using test set...")
         model_eval = Model_Evaluation(config_path)
-        model_eval.eval()
+        model_eval.evaluate()
 
     # Model Inference on Unseen Data
     if mode.lower() == "inference":

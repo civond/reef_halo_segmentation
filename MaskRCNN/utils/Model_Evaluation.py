@@ -68,7 +68,7 @@ class Model_Evaluation:
             pin_memory=self.pin_memory
         )
 
-    def eval(self):
+    def evaluate(self):
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         save_dir = os.path.join(self.output_dir, "eval_"+timestamp)
         os.makedirs(save_dir, exist_ok=True)
