@@ -2,7 +2,6 @@ from utils.dataset import ImageDataset
 from utils.collate_fn import collate_fn
 from torch.utils.data import DataLoader
 
-
 def get_loader(
         df,
         batch_size,
@@ -17,7 +16,7 @@ def get_loader(
         df=df, 
         train=train,
         transform=transform
-        )
+    )
 
     # Create loader object
     loader = DataLoader(

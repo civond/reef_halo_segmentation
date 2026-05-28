@@ -6,21 +6,34 @@ from torchvision.models.detection.rpn import RegionProposalNetwork
 import torch.nn.functional as F
 import torch
 
-# --- Focal Loss helpers ---
+# Focal loss helper functions
 def sigmoid_focal_loss(inputs, targets, alpha=0.25, gamma=2.0):
     p = torch.sigmoid(inputs)
-    ce = F.binary_cross_entropy_with_logits(inputs, targets, reduction="none")
+    cross_entropy = F.binary_cross_entropy_with_logits(
+        inputs, 
+        targets, 
+        reduction="none"
+    )
     p_t = p * targets + (1 - p) * (1 - targets)
-    loss = ce * ((1 - p_t) ** gamma)
+    loss = cross_entropy * ((1 - p_t) ** gamma)
     alpha_t = alpha * targets + (1 - alpha) * (1 - targets)
-    return (alpha_t * loss).mean()
+    mean = (alpha_t * loss).mean()
+
+    return mean
 
 def softmax_focal_loss(inputs, targets, alpha=0.25, gamma=2.0):
-    ce = F.cross_entropy(inputs, targets, reduction="none")
-    p_t = torch.exp(-ce)
-    return (alpha * ((1 - p_t) ** gamma) * ce).mean()
+    cross_entropy = F.cross_entropy(
+        inputs, 
+        targets, 
+        reduction="none"
+    )
+    p_t = torch.exp(-cross_entropy)
+    softmax = (alpha * ((1 - p_t) ** gamma) * cross_entropy)
+    softmax = softmax.mean()
 
-# --- Subclassed ROI head ---
+    return softmax
+
+# ROI head class
 class FocalRoIHeads(RoIHeads):
     def fastrcnn_loss(self, class_logits, box_regression, labels, regression_targets):
         labels = torch.cat(labels, dim=0)
@@ -42,7 +55,7 @@ class FocalRoIHeads(RoIHeads):
 
         return classification_loss, box_loss
 
-# --- Subclassed RPN ---
+# RPN class
 class FocalRPN(RegionProposalNetwork):
     def compute_loss(self, objectness, pred_bbox_deltas, labels, regression_targets):
         sampled_pos_inds, sampled_neg_inds = self.fg_bg_sampler(labels)
@@ -68,8 +81,8 @@ class FocalRPN(RegionProposalNetwork):
 
         return objectness_loss, box_loss
     
+# Reformat MaskRCNN model
 def get_maskrcnn_model():
-    # Import MaskRCNN
     model = maskrcnn_resnet50_fpn(
         weights=MaskRCNN_ResNet50_FPN_Weights.DEFAULT,
         min_size=512,

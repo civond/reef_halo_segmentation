@@ -1,12 +1,9 @@
 import torch
 from torchvision.ops import nms
-import cv2
-import numpy as np
 import toml
-from tqdm import tqdm
 import os
 import pandas as pd
-import time
+import datetime
 os.environ["QT_QPA_PLATFORM"] = "xcb"
 
 # Custom imports
@@ -21,7 +18,8 @@ class Model_Evaluation:
         
         # Parameters
         settings = self.config["Settings"]
-
+        self.num_workers = settings["num_workers"]
+        self.pin_memory = settings["pin_memory"]
         self.useFold = settings["useFold"]
         self.score_threshold = settings["score_threshold"]
         self.mask_threshold = settings["mask_threshold"]
@@ -34,7 +32,6 @@ class Model_Evaluation:
         self.dataset = pd.read_csv(paths["dataset_pth"])
         self.dataset = self.dataset[self.dataset["fold"] == self.useFold]
         self.model_pth = paths["model_pth"]
-        self.img_pth = paths["img_pth"]
 
         # Ensure output dir exists
         self.output_dir = paths["output_dir"]
@@ -69,14 +66,27 @@ class Model_Evaluation:
         )
 
     def eval(self):
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        save_dir = os.path.join(self.output_dir, "eval_"+timestamp)
+        os.makedirs(save_dir, exist_ok=True)
+        
+        # Output settings used for reproducibility
+        settings_path = os.path.join(save_dir, "settings.txt")
+        with open(settings_path, "w") as f:
+            f.write(f"timestamp       : {timestamp}\n")
+            f.write(f"model_pth       : {self.model_pth}\n")
+            f.write(f"fold            : {self.useFold}\n")
+            f.write(f"score_threshold : {self.score_threshold}\n")
+            f.write(f"mask_threshold  : {self.mask_threshold}\n")
+            f.write(f"iou_threshold   : {self.iou_threshold}\n")
+            f.write(f"batch_size      : {self.batch_size}\n")
+
+        # Generate predictions
         [eval_predictions, eval_dice] = eval_fn(
             device=self.device,
             loader=self.eval_loader,
             model=self.model,
-            score_threshold=self.score_threshold
+            score_threshold=self.score_threshold,
+            save_dir=save_dir
         )
-        self._save_outputs(eval_predictions)
 
-
-    def _save_outputs(self, predictions):
-        print("")

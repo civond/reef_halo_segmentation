@@ -7,18 +7,18 @@ os.environ["QT_QPA_PLATFORM"] = "xcb"
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 # Custom classes
-from MaskRCNN.utils.Model_Trainer import Model_Trainer
-from MaskRCNN.utils.Model_KFoldTrainer import Model_KFoldTrainer
-from MaskRCNN.utils.Model_Inference import Model_Inference
-from MaskRCNN.utils.Model_Evaluation import Model_Evaluation
+from utils.Model_Trainer import Model_Trainer
+from utils.Model_KFoldTrainer import Model_KFoldTrainer
+from utils.Model_Inference import Model_Inference
+from utils.Model_Evaluation import Model_Evaluation
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Train segmentation model")
     parser.add_argument(
         "mode",
         type=str,
-        choices=["train", "crossval", "inference"],
-        help="Please choose from: ['train', 'crossval', 'inference']"
+        choices=["train", "eval", "crossval", "inference"],
+        help="Please choose from: ['train', 'eval', 'crossval', 'inference']"
     )
     parser.add_argument(
         "config_file",
@@ -48,8 +48,8 @@ def main():
     # Model Evaluation
     if mode.lower() == "eval":
         print("Running model eval. using test set...")
-        model_test = Model_Evaluation(config_path)
-        model_test.train_loop()
+        model_eval = Model_Evaluation(config_path)
+        model_eval.eval()
 
     # Model Inference on Unseen Data
     if mode.lower() == "inference":
