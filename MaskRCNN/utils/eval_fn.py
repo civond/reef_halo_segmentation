@@ -6,7 +6,7 @@ from utils.calculate_dice import calculate_dice
 from utils.calculate_iou import calculate_iou
 import numpy as np
 
-def eval_fn(device, loader, model, score_threshold=0.5, save_dir=None):
+def eval_fn(device, loader, model, score_threshold=0.5, save_dir=None, save_logits=False):
     loop = tqdm(loader, desc="Evaluating", leave=False)
 
     # Track eval predictions and dice score
@@ -39,16 +39,24 @@ def eval_fn(device, loader, model, score_threshold=0.5, save_dir=None):
                 else:
                     keep = pred["scores"] > score_threshold
                     if keep.any():
-                        masks = pred["masks"][keep]        # (N, 1, H, W)
-                        masks = (masks.squeeze(1) > 0.5).float()
-                        pred_mask = masks.max(0)[0]        # (H, W)
+                        masks = pred["masks"][keep]
+                        soft_mask = masks.squeeze(1).max(0)[0]
+                        pred_mask = (soft_mask > 0.5).float()
                     else:
+                        soft_mask = torch.zeros_like(gt_mask)
                         pred_mask = torch.zeros_like(gt_mask)
-
+                        
                 # Calculate Dice score and IOU
                 dice = calculate_dice(pred_mask, gt_mask)
                 iou = calculate_iou(pred_mask, gt_mask)
 
+                if save_logits == True:
+                    stem = os.path.splitext(filename)[0]
+                    torch.save(
+                        {"soft_mask": soft_mask.cpu(), "gt_mask": gt_mask.cpu()},
+                        os.path.join(save_dir, f"{stem}_logit.pt")
+                    )
+                    
                 if gt_mask.sum() > 0:
                     total_dice += dice
                     total_iou += iou
@@ -69,19 +77,8 @@ def eval_fn(device, loader, model, score_threshold=0.5, save_dir=None):
                 plt.tight_layout()
 
                 temp_path = os.path.join(save_dir, filename.replace(".png", "_eval.png"))
-
-                
                 plt.savefig(temp_path, bbox_inches="tight")
                 plt.close(fig)
-
-
-                """eval_predictions.append({
-                    "filename": filename,
-                    "pred_mask": pred_mask,
-                    "dice": dice
-                })"""
-
-                
 
     avg_dice = total_dice / count
     avg_iou = total_iou / count

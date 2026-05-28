@@ -15,10 +15,11 @@ output_dir = "./MaskRCNN/output/"                                            # S
 useFold = 4                                         # Which fold to use for test set.
 batch_size = 16                                     # Batch size (if using GPU)
 use_cuda= true                                      # GPU available?
+save_logits = true                                  # Save logits?
 
 pin_memory = true
 num_workers = 8 
 score_threshold=0.5                                 # Masks to keep
-mask_threshold=0.15                                  # Define what is a mask pixel
+mask_threshold=0.1                                 # Define what is a mask pixel
 use_overlap=true                                    # If true, add filling tiles at 2x2 intersections
 iou_threshold=0.3                                   # IOU threshold for NMS

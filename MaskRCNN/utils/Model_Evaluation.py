@@ -11,6 +11,7 @@ from utils.get_loader import get_loader
 from utils.eval_fn import eval_fn
 from utils.create_transforms import create_transforms
 from utils.get_maskrcnn_model import get_maskrcnn_model
+from utils.eval_aucroc import eval_aucroc
 
 class Model_Evaluation:
     def __init__(self, config_path: str):
@@ -18,6 +19,7 @@ class Model_Evaluation:
         
         # Parameters
         settings = self.config["Settings"]
+        self.save_logits = settings["save_logits"]
         self.num_workers = settings["num_workers"]
         self.pin_memory = settings["pin_memory"]
         self.useFold = settings["useFold"]
@@ -77,6 +79,12 @@ class Model_Evaluation:
             loader=self.eval_loader,
             model=self.model,
             score_threshold=self.score_threshold,
+            save_dir=save_dir,
+            save_logits=self.save_logits
+        )
+
+        # Calculate AUC-ROC
+        [auc, optimal_threshold] = eval_aucroc(
             save_dir=save_dir
         )
 
@@ -85,6 +93,8 @@ class Model_Evaluation:
         with open(settings_path, "w") as f:
             f.write(f"Mean IOU        : {eval_iou}\n")
             f.write(f"Mean Dice       : {eval_dice}\n")
+            f.write(f"AUC             : {auc}\n")
+            f.write(f"optimal_thresh  : {optimal_threshold}\n")
             f.write(f"timestamp       : {timestamp}\n")
             f.write(f"dataset_pth     : {self.dataset_path}\n")
             f.write(f"model_pth       : {self.model_pth}\n")
