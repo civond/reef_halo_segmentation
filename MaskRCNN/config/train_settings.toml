@@ -8,7 +8,7 @@ dataset_path = "./MaskRCNN/balanced.csv"
 # Hyperparameters
 # ============================
 [Hyperparameters]
-learning_rate = 1e-5        
+learning_rate = 1e-4        
 batch_size = 16                 # If using lab computer, 128 is recommended
 num_epochs = 50                 # Can set to arbitrarily high number
 num_workers = 8                 # ~ 1 per CPU core

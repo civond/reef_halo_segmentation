@@ -2,18 +2,22 @@ import torch
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 import os
+from torchmetrics.detection import MeanAveragePrecision
 from utils.calculate_dice import calculate_dice
 from utils.calculate_iou import calculate_iou
+
 import numpy as np
 
 def eval_fn(device, loader, model, score_threshold=0.5, save_dir=None, save_logits=False):
     loop = tqdm(loader, desc="Evaluating", leave=False)
 
     # Track eval predictions and dice score
-    eval_predictions = []
     total_dice = 0
     total_iou = 0
     count=0
+
+    # AP metric — needs per-instance masks, not unioned
+    map_metric = MeanAveragePrecision(iou_type="segm")
 
     # Disable gradient calculation (back prop)
     with torch.no_grad():
@@ -45,11 +49,34 @@ def eval_fn(device, loader, model, score_threshold=0.5, save_dir=None, save_logi
                     else:
                         soft_mask = torch.zeros_like(gt_mask)
                         pred_mask = torch.zeros_like(gt_mask)
-                        
+                
                 # Calculate Dice score and IOU
                 dice = calculate_dice(pred_mask, gt_mask)
                 iou = calculate_iou(pred_mask, gt_mask)
+                
+                # Calculate AP metrics
+                n_pred = len(pred["masks"])
+                n_gt = target["masks"].shape[0]
 
+                H, W = target["masks"].shape[-2], target["masks"].shape[-1]
+                map_metric.update(
+                    preds=[{
+                        "masks": (pred["masks"].squeeze(1) > 0.5).bool().cpu() if n_pred > 0
+                                 else torch.zeros(0, H, W, dtype=torch.bool),
+                        "scores": pred["scores"].cpu() if n_pred > 0
+                                  else torch.zeros(0),
+                        "labels": torch.zeros(n_pred, dtype=torch.int).cpu() if n_pred > 0
+                                  else torch.zeros(0, dtype=torch.int),
+                    }],
+                    target=[{
+                        "masks": (target["masks"] > 0.5).bool().cpu() if n_gt > 0
+                                 else torch.zeros(0, H, W, dtype=torch.bool),
+                        "labels": torch.zeros(n_gt, dtype=torch.int).cpu() if n_gt > 0
+                                  else torch.zeros(0, dtype=torch.int),
+                    }]
+                )
+
+                # Save logits?
                 if save_logits == True:
                     stem = os.path.splitext(filename)[0]
                     torch.save(
@@ -82,7 +109,15 @@ def eval_fn(device, loader, model, score_threshold=0.5, save_dir=None, save_logi
 
     avg_dice = total_dice / count
     avg_iou = total_iou / count
-    print(f"\tAvg. Dice score: {avg_dice:.4f}")
-    print(f"\tAvg. IOU: {avg_iou:.4f}")
 
-    return avg_iou, avg_dice
+    # Compute AP
+    ap_results = map_metric.compute()
+
+    # Print statements
+    print(f"\tAvg. Precision @50%:     {ap_results['map_50']:.4f}")
+    print(f"\tAvg. Precision @75%:     {ap_results['map_75']:.4f}")
+    print(f"\tAvg. Precision @50:95%:  {ap_results['map']:.4f}")
+    print(f"\tAvg. Dice score:         {avg_dice:.4f}")
+    print(f"\tAvg. IoU:                {avg_iou:.4f}")
+
+    return avg_iou, avg_dice, ap_results
