@@ -65,7 +65,7 @@ def eval_aucroc(save_dir):
     ax.legend()
 
     plt.tight_layout()
-    plt.savefig(os.path.join(save_dir, "roc_curve.png"), bbox_inches="tight")
+    plt.savefig(os.path.join(save_dir, "eval_aucroc.png"), bbox_inches="tight")
     plt.close(fig)
 
     return auc, optimal_threshold

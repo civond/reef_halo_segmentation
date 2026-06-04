@@ -19,7 +19,7 @@ class Model_Evaluation:
         
         # Parameters
         settings = self.config["Settings"]
-        self.save_logits = settings["save_logits"]
+        self.keep_logits = settings["keep_logits"]
         self.num_workers = settings["num_workers"]
         self.pin_memory = settings["pin_memory"]
         self.useFold = settings["useFold"]
@@ -74,13 +74,12 @@ class Model_Evaluation:
         os.makedirs(save_dir, exist_ok=True)
 
         # Generate predictions
-        [eval_iou, eval_dice, ap_results] = eval_fn(
+        [metrics, ap_results] = eval_fn(
             device=self.device,
             loader=self.eval_loader,
             model=self.model,
             score_threshold=self.score_threshold,
             save_dir=save_dir,
-            save_logits=self.save_logits
         )
 
         # Calculate AUC-ROC
@@ -88,11 +87,23 @@ class Model_Evaluation:
             save_dir=save_dir
         )
 
+
+        # Cleanup
+        if self.keep_logits == False:
+            files_deleted = 0
+            for file in os.listdir(save_dir):
+                if file.endswith(".pt"):
+                    os.remove(os.path.join(save_dir, file))
+                    files_deleted+=1
+            print(f"Files deleted: {files_deleted}")
+            
         # Output log file with settings used for reproducibility
-        settings_path = os.path.join(save_dir, "log.txt")
+        settings_path = os.path.join(save_dir, "eval_log.txt")
         with open(settings_path, "w") as f:
-            f.write(f"Avg. IoU                  : {eval_iou}\n")
-            f.write(f"Avg. Dice                 : {eval_dice}\n")
+            f.write(f"Avg. IoU                  : {metrics.iou.avg}\n")
+            f.write(f"IoU STD                   : {metrics.iou.std}\n")
+            f.write(f"Avg. Dice                 : {metrics.dice.avg}\n")
+            f.write(f"Dice STD                  : {metrics.dice.std}\n")
             f.write(f"Avg. Precision @50%       : {ap_results['map_50']}\n")
             f.write(f"Avg. Precision @75%       : {ap_results['map_75']}\n")
             f.write(f"Avg. Precision @50:95%    : {ap_results['map']}\n")
@@ -106,4 +117,4 @@ class Model_Evaluation:
             f.write(f"mask_threshold            : {self.mask_threshold}\n")
             f.write(f"iou_threshold             : {self.iou_threshold}\n")
             f.write(f"batch_size                : {self.batch_size}\n")
-
+        print(f"\nSaved log.txt to {settings_path}")

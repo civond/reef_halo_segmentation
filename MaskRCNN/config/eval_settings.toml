@@ -13,9 +13,9 @@ output_dir = "./MaskRCNN/output/"                                            # S
 # ============================
 [Settings]
 useFold = [0,1,2,3,4]                               # Which fold to use for test set. Must be in list format
-batch_size = 16                                     # Batch size (if using GPU)
+batch_size = 32                                     # Batch size (if using GPU)
 use_cuda= true                                      # GPU available?
-save_logits = true                                  # Save logits?
+keep_logits = false                                  # Save logits?
 
 pin_memory = true
 num_workers = 8 
