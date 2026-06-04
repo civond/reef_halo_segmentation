@@ -114,7 +114,7 @@ class Inference:
         with torch.no_grad():
             for data, labels, filenames in loop:
                 data = data.to(self.device)
-                labels = labels.to(self.device)     # for BCE
+                labels = labels.to(self.device)
 
                 # Forward pass
                 predictions = self.model(data)
